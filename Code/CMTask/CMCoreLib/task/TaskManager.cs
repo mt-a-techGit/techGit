@@ -77,7 +77,7 @@ namespace CMCore.task
 
             
         }
-  
+
         private void monitorTasks(ScheduledTask task)
         {
             LogFile errorLogTask = new LogFile(@"TaskManager\errorHandlerLog\", "TaskManager.log");
@@ -91,21 +91,114 @@ namespace CMCore.task
 
                 switch (task.ETaskSource)
                 {
+                
+
+                    case "Yad2":
                     case "Winwin":
+                    case "Homeless":
+                    case "WinwinProfessional":
+                    case "HomelessClasses":
+                    case "HomelessWorkshop":
+                    case "HomelessCourses":
+                    case "HomelessLecture":
+                    case "HomelessPrivateClasses":
+                    case "HomelessMeetings":
+                    case "HomelessVehicle":
+                    case "WinwinVehicle":
+
                         string url = "";
-                    switch (task.TaskName)
-                    {
-                        case "GetPageData":
-                            if (task.ETaskSource == "Winwin")
-                            {
-                                Winwin site = new Winwin(task.Id, task.ETaskSource, task.TaskDate, task.CityName);
-                                SiteBase = site;
-                                downloadStatusType = site.getPageData(task.MinPage);
-                            }
-                       break;
-                    }
-                    break;
+
+                        switch (task.TaskName)
+                        {
+                            case "GetPageData":
+
+                                if (task.ETaskSource == "Yad2")
+                                {
+                                    Y2 site = new Y2(task.Id, task.ETaskSource, task.TaskDate,task.CityName);
+                                    downloadStatusType = site.getPageData(task.MinPage);
+
+                                }
+                                else if (task.ETaskSource == "Homeless")
+                                {
+                                    Homeless site = new Homeless(task.Id, task.ETaskSource, task.TaskDate);
+                                    downloadStatusType = site.getPageData(task.MinPage);
+
+                                }
+                                else if (task.ETaskSource == "WinwinVehicle")
+                                {
+                                    WinwinVehicle site = new WinwinVehicle(task.Id, task.TaskDate);
+                                    downloadStatusType = site.getPageData(task.MinPage);
+
+                                }
+                                else if (task.ETaskSource == "HomelessVehicle")
+                                {
+                                    HomelessVehicle site = new HomelessVehicle(task.Id, task.ETaskSource, task.TaskDate);
+                                    downloadStatusType = site.getPageData(task.MinPage);
+
+                                }
+
+                                else if (task.ETaskSource == "WinwinProfessional")
+                                {
+                                    WinwinProfessional site = new WinwinProfessional(task.Id);
+                                    SiteBase = site;
+                                    downloadStatusType = site.getPageData(task.MinPage);
+                                }
+                                else if (task.ETaskSource == "Winwin")
+                                {
+                                    Winwin site = new Winwin(task.Id, task.ETaskSource, task.TaskDate, task.CityName);
+                                    SiteBase = site;
+                                    downloadStatusType = site.getPageData(task.MinPage);
+                                }
+                                else if (task.ETaskSource == "HomelessClasses")
+                                {
+                                    HomelessClasses site = new HomelessClasses(task.Id);
+                                    SiteBase = site;
+                                    downloadStatusType = site.getPageData(task.MinPage, "Classes");
+
+                                }
+                                else if (task.ETaskSource == "HomelessCourses")
+                                {
+                                    HomelessClasses site = new HomelessClasses(task.Id);
+                                    SiteBase = site;
+                                    downloadStatusType = site.getPageData(task.MinPage, "Courses");
+
+                                }
+                                else if (task.ETaskSource == "HomelessWorkshop")
+                                {
+                                    HomelessClasses site = new HomelessClasses(task.Id);
+                                    SiteBase = site;
+                                    downloadStatusType = site.getPageData(task.MinPage, "Workshop");
+
+                                }
+                                else if (task.ETaskSource == "HomelessLecture")
+                                {
+                                    HomelessClasses site = new HomelessClasses(task.Id);
+                                    SiteBase = site;
+                                    downloadStatusType = site.getPageData(task.MinPage, "Lecture");
+
+                                }
+                                else if (task.ETaskSource == "HomelessPrivateClasses")
+                                {
+                                    HomelessClasses site = new HomelessClasses(task.Id);
+                                    SiteBase = site;
+                                    downloadStatusType = site.getPageData(task.MinPage, "PrivateClasses");
+
+                                }
+                                else if (task.ETaskSource == "HomelessMeetings")
+                                {
+                                    HomelessClasses site = new HomelessClasses(task.Id);
+                                    SiteBase = site;
+                                    downloadStatusType = site.getPageData(task.MinPage, "Meetings");
+
+                                }
+                                break;
+
+                             
+                        }
+                        break;
                 }
+
+
             }
 
             catch (Exception ex)
@@ -114,9 +207,9 @@ namespace CMCore.task
                 errorLogTask.handleException(ex);
                 errorLogTask.writeToLogFile("at DB GetTasks");
             }
-           
+             
         }
-
+ 
         
 
          
