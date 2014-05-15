@@ -92,22 +92,26 @@ namespace BLL.BLL
             }
         }
 
+
         public DataTable getTasks(int maxTasks)
         {
             try
             {
                 StringBuilder commandText = new StringBuilder("");
-                commandText.Append(" CREATE TEMP TABLE TasksTable(Id, TaskName, ETaskSource, TaskDate, City, TaskType,MinPage) ; ");
-                commandText.Append(" INSERT INTO TasksTable (Id, TaskName, ETaskSource, TaskDate, City, TaskType ,MinPage) ");
-                commandText.Append(" SELECT   Tasks.Id, TaskName,Name as ETaskSource, TaskDate, CityName, TaskType AS CurType, MinPage ");
-                commandText.Append(" FROM Tasks INNER JOIN ");
-                commandText.Append(" TaskTypes ON Tasks.TaskType = TaskTypes.Id INNER JOIN ");
-                commandText.Append(" ETaskSource ON TaskTypes.ETaskSource = ETaskSource.Id LEFT JOIN");
-                commandText.Append(" Cities ON Cities.Id = Tasks.City ");
-
-                commandText.Append(" WHERE   CurrentState = (SELECT Id FROM TaskStatus WHERE (Status = 'Waiting') ) ");
-                
-                commandText.Append(" AND (SELECT COUNT(Id) FROM Tasks WHERE CurType = TaskType AND   CurrentState = (SELECT Id FROM TaskStatus WHERE (Status = 'Process'))  ) <  "+ maxTasks);
+                commandText.Append(" CREATE TEMP TABLE TasksTable(TypeCount,Id, TaskName, ETaskSource, TaskDate, City, TaskType,MinPage) ; ");
+                commandText.Append(" INSERT INTO TasksTable (TypeCount,Id, TaskName, ETaskSource, TaskDate, City, TaskType ,MinPage) ");
+                commandText.Append(" SELECT   ( CASE WHEN Name in('Homeless','HomelessClasses','HomelessCourses','HomelessWorkshop','HomelessWorkshop','HomelessLecture','HomelessPrivateClasses','HomelessMeetings') ");
+                commandText.Append(" THEN (SELECT COUNT(Tasks.id) FROM Tasks INNER JOIN TaskTypes  ON TaskTypes.id = Tasks.TaskType INNER JOIN ETaskSource  ON TaskTypes.ETaskSource = ETaskSource.id");
+                commandText.Append(" WHERE    CurrentState = (SELECT Id FROM TaskStatus  WHERE (Status = 'Process'))   ");
+                commandText.Append(" AND  ETaskSource.Name in('Homeless','HomelessClasses','HomelessCourses','HomelessWorkshop','HomelessWorkshop','HomelessLecture','HomelessPrivateClasses','HomelessMeetings'))");
+                commandText.Append(" WHEN Name in('WinwinVehicle','Winwin','WinwinProfessional') THEN    (SELECT COUNT(Tasks.id) FROM Tasks INNER JOIN TaskTypes  ON TaskTypes.id = Tasks.TaskType ");
+                commandText.Append(" INNER JOIN ETaskSource  ON TaskTypes.ETaskSource = ETaskSource.id WHERE CurrentState = (SELECT Id FROM TaskStatus  WHERE (Status = 'Process'))   ");
+                commandText.Append(" AND  ETaskSource.Name in('WinwinVehicle','Winwin','WinwinProfessional')) ELSE 0 END) as TypeCount,");
+                commandText.Append(" Tasks.Id , TaskName,Name , TaskDate, CityName, TaskType AS CurType, MinPage FROM Tasks INNER JOIN  TaskTypes ON Tasks.TaskType = TaskTypes.Id INNER JOIN ");
+                commandText.Append(" ETaskSource ON TaskTypes.ETaskSource = ETaskSource.Id LEFT JOIN Cities ON Cities.Id = Tasks.City   ");
+                commandText.Append(" WHERE (select count(*)  from tasks where currentState=4)<4 AND   TypeCount <" + (maxTasks + 1) + " AND CurrentState = (SELECT Id FROM TaskStatus WHERE (Status = 'Waiting') )  AND (");
+                commandText.Append(" SELECT COUNT(Id) FROM Tasks WHERE CurType = TaskType AND  ");
+                commandText.Append(" CurrentState = (SELECT Id FROM TaskStatus  WHERE (Status = 'Process'))  ) <" + (maxTasks));
                 commandText.Append(" ORDER BY Priority,RANDOM()  LIMIT 1; ");
                 commandText.Append(" UPDATE tasks SET CurrentState=(SELECT Id FROM TaskStatus WHERE (Status = 'Process')) ");
                 commandText.Append(" WHERE  id in(SELECT id FROM TasksTable); ");
@@ -119,7 +123,6 @@ namespace BLL.BLL
                 commandText.Append(" SELECT (SELECT Id FROM TaskStatus WHERE (Status = 'Waiting') ),1,(SELECT  Id from TaskTypes WHERE TaskName='GetPageData'  AND ETaskSource=(SELECT Id FROM ETaskSource WHERE Name='Winwin' )) AS CurType,");
                 commandText.Append(" NULL AS LastInUse ,  date('now','-1 day'),Id From Cities  ");
                 commandText.Append(" WHERE 0=(SELECT COUNT (Id) FROM Tasks WHERE TaskDate=(SELECT date('now','-1 day') ) AND TaskType = CurType) ; ");
-
                 if (helper.Load(commandText.ToString(), "") == true)
                     return helper.DataSet.Tables[0];
                 return null;
@@ -131,6 +134,7 @@ namespace BLL.BLL
                 return null;
             }
         }
+
 
     }
 }

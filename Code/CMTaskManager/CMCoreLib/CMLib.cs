@@ -7,8 +7,6 @@ using System.Data;
 using ManageLogFile;
 using OpenQA.Selenium;
 using System.Collections.ObjectModel;
-using OpenQA.Selenium.Firefox;
-
 
 namespace CMCore
 {

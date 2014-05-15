@@ -50,7 +50,7 @@ namespace CMCore.task
 
         }
 
-        int maxTasksNum =4;
+        int maxTasksNum =3;
         BLL.BLL.TaskBL tasksBL;
 
         public void updateTasks()
@@ -60,7 +60,6 @@ namespace CMCore.task
 
             lock (this)
             {
-                Path.
                 DataTable tasks = tasksBL.getTasks(maxTasksNum);
                 if (tasks == null)
                     return;
@@ -69,7 +68,7 @@ namespace CMCore.task
                     int Id = 0;
                     int.TryParse(tasks.Rows[i]["Id"].ToString(), out Id);
                     Process ffmpeg = new Process();
-                    ffmpeg.StartInfo.FileName =@"C:\Users\MyPcUser\Desktop\CMNew\CM2\CMTask\CM\bin\Debug\CM.exe";
+                    ffmpeg.StartInfo.FileName = @"C:\Project\techGit\Code\CMTask\CM\bin\Debug\CM.exe";
                     ffmpeg.StartInfo.Arguments = tasks.Rows[i]["Id"].ToString();
                     ffmpeg.Start();
                 }
