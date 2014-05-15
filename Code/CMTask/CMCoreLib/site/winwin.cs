@@ -452,11 +452,16 @@ namespace CMCore.site
                     {
                         System.Collections.ObjectModel.ReadOnlyCollection<IWebElement> TableTds = curTr.FindElements(By.XPath(".//td"));
                         string dd = TableTds[10].Text;
-                        DateTime rowDate = DateTime.MaxValue;
-                        DateTime.TryParse(dd, out rowDate);
-                        mainTableTrs.Add(curTr);
-                        if (compareDate != 0)
-                            compareDate = comparePageDate(rowDate);
+                        System.Collections.ObjectModel.ReadOnlyCollection<IWebElement> img = TableTds[1].FindElements(By.XPath(".//img"));
+                        if(img.Count==0)
+                        { 
+                            DateTime rowDate = DateTime.MaxValue;
+                            DateTime.TryParse(dd, out rowDate);
+                            mainTableTrs.Add(curTr);
+                            if (compareDate != 0)
+                                compareDate = comparePageDate(rowDate) ;
+                        }
+                       
 
                     }
                 }

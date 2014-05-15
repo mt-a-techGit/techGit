@@ -25,15 +25,14 @@ namespace CMCore.site
             this.pageDate = pageDate;
         }
  
-
         public static string getPageUrl()
         {
-            return "http://www.winwin.co.il/Cars/CarPage.aspx";
+            return "http://www.winwin.co.il/Cars/Search/SearchResults/CarPage.aspx?search=eaec151e206931536a77eb277a3b1bf6";
         }
 
         public static string getBasePageUrl()
         {
-            return "http://www.winwin.co.il/Cars/CarPage.aspx";
+            return "http://www.winwin.co.il/Cars/Search/SearchResults/CarPage.aspx?search=eaec151e206931536a77eb277a3b1bf6";
         }
 
         public TTaskStatusType getPageData(string MinPage)
@@ -58,21 +57,28 @@ namespace CMCore.site
             string Url = MinPage;
 
             if (MinPage == "" || MinPage == "0")
-                Url = getBasePageUrl();
-            else
-                Url = "http://www.winwin.co.il/Cars/Search/SearchResults/CarPage.aspx?PageNumberBottom=" + MinPage + "&PageNumberTop=" + MinPage;
-            if (!driverUtils.NevigateToPage(myDriver.WebDriver, Url))
             {
-                release(TTaskStatusType.Failed.ToString());
-                return TTaskStatusType.DriverError;
+                Url = getBasePageUrl();
+                if (!driverUtils.NevigateToPage(myDriver.WebDriver, Url))
+                {
+                    release(TTaskStatusType.Failed.ToString());
+                    return TTaskStatusType.DriverError;
+                }
             }
-   
+            else
+            {
+                if (!goToPage(curPage))
+                {
+                    release(TTaskStatusType.Failed.ToString());
+                    return TTaskStatusType.DriverError;
+                }
+            }  
             return getMainTableData(curPage);
         }
 
         private bool goToPage(int pageNum)
         {
-            return driverUtils.NevigateToPage(myDriver.WebDriver, "http://www.winwin.co.il/Cars/Search/SearchResults/CarPage.aspx?PageNumberBottom=" + pageNum + "&PageNumberTop=" + pageNum);
+            return driverUtils.NevigateToPage(myDriver.WebDriver, "http://www.winwin.co.il/Cars/Search/SearchResults/CarPage.aspx?PageNumberBottom=" + pageNum + "&PageNumberTop=" + pageNum + "&search=eaec151e206931536a77eb277a3b1bf6");
         }
 
         private TTaskStatusType getMainTableData(int curPage)
@@ -87,6 +93,7 @@ namespace CMCore.site
             while (true)
             {
                 List<IWebElement> mainTableRows = getBasisTable();
+                driverUtils.CloseOtherWindows(myDriver.WebDriver);
                 if (mainTableRows == null)
                 {
                     release(TTaskStatusType.Failed.ToString());
@@ -274,8 +281,6 @@ namespace CMCore.site
             }
         }
 
-
-
         private IWebElement clickRow(List<IWebElement> mainTableRows, int rowNum)
         {
             try
@@ -370,6 +375,7 @@ namespace CMCore.site
                 return null;
             }
         }
+
         private int comparePageDate(DateTime date)
         {
             try
@@ -419,7 +425,6 @@ namespace CMCore.site
                 return  ;
             }
         }
-
 
     }
 }

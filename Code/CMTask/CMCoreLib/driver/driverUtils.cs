@@ -113,9 +113,17 @@ namespace CMCore.site
             return webDriver;
         }
 
-        public static void ExecuteScript(IWebDriver driver, string scriptValue)
+        public static string ExecuteScript(IWebDriver driver, string scriptValue)
         {
-            var t = ((IJavaScriptExecutor)driver).ExecuteScript(scriptValue);
+            try
+            {
+                var t = ((IJavaScriptExecutor)driver).ExecuteScript(scriptValue);
+                return t.ToString();
+            }
+            catch (Exception ex)
+            {
+                return "";
+            }
         }
 
         public static void refreshPage(IWebDriver driver)

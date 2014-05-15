@@ -49,6 +49,7 @@ namespace CMCore.site
             if (myDriver == null)
                 return TTaskStatusType.DriverError;
             TTaskStatusType downloadStatusType = getSitePageData(MinPage);
+            release(downloadStatusType.ToString());
             return downloadStatusType;
             }
             catch (Exception ex)
@@ -274,6 +275,7 @@ namespace CMCore.site
                 {
 
                     List<IWebElement> mainTableRows = getBasisTable();
+                    driverUtils.CloseOtherWindows(myDriver.WebDriver);
                     if (mainTableRows == null)
                     {
                         release(TTaskStatusType.Failed.ToString());

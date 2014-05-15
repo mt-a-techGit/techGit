@@ -63,7 +63,7 @@
   </ItemGroup>
   <ItemGroup>
     <ProjectReference Include="..\CMCoreLib\CMCore.csproj">
-      <Project>{DC31143D-668F-4D94-9631-BC1A6321007B}</Project>
+      <Project>{dc31143d-668f-4d94-9631-bc1a6321007b}</Project>
       <Name>CMCore</Name>
     </ProjectReference>
     <ProjectReference Include="..\Contact\Contact.csproj">

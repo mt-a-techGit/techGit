@@ -60,6 +60,7 @@
     <Compile Include="site\Homeless.cs" />
     <Compile Include="site\HomelessClasses.cs" />
     <Compile Include="site\HomelessVehicle.cs" />
+    <Compile Include="site\nadlanRent.cs" />
     <Compile Include="site\winwin.cs" />
     <Compile Include="site\WinwinProfessional.cs" />
     <Compile Include="site\WinwinVehicle.cs" />

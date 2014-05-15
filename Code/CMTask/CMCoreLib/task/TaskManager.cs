@@ -47,7 +47,6 @@ namespace CMCore.task
         private TaskManager()
         {
             tasksBL = new TaskBL(errorLog, infoLog);
-
         }
  
         BLL.BLL.TaskBL tasksBL;
@@ -74,8 +73,6 @@ namespace CMCore.task
                 ScheduledTask task = new ScheduledTask(Id, ETaskSource, TaskName, TaskDate, CityName, MinPage);
                 monitorTasks(task);
             }
-
-            
         }
 
         private void monitorTasks(ScheduledTask task)
@@ -86,13 +83,8 @@ namespace CMCore.task
             TTaskStatusType downloadStatusType = TTaskStatusType.Failed;
             try
             {
-
-
-
                 switch (task.ETaskSource)
                 {
-                
-
                     case "Yad2":
                     case "Winwin":
                     case "Homeless":
@@ -105,7 +97,7 @@ namespace CMCore.task
                     case "HomelessMeetings":
                     case "HomelessVehicle":
                     case "WinwinVehicle":
-
+                    case "NadlanRent":
                         string url = "";
 
                         switch (task.TaskName)
@@ -116,27 +108,28 @@ namespace CMCore.task
                                 {
                                     Y2 site = new Y2(task.Id, task.ETaskSource, task.TaskDate,task.CityName);
                                     downloadStatusType = site.getPageData(task.MinPage);
+                                }
 
+                                else if (task.ETaskSource == "NadlanRent")
+                                {
+                                    nadlanRent site = new nadlanRent(task.Id, task.ETaskSource, task.TaskDate);
+                                    downloadStatusType = site.getPageData(task.MinPage);
                                 }
                                 else if (task.ETaskSource == "Homeless")
                                 {
                                     Homeless site = new Homeless(task.Id, task.ETaskSource, task.TaskDate);
                                     downloadStatusType = site.getPageData(task.MinPage);
-
                                 }
                                 else if (task.ETaskSource == "WinwinVehicle")
                                 {
                                     WinwinVehicle site = new WinwinVehicle(task.Id, task.TaskDate);
                                     downloadStatusType = site.getPageData(task.MinPage);
-
                                 }
                                 else if (task.ETaskSource == "HomelessVehicle")
                                 {
                                     HomelessVehicle site = new HomelessVehicle(task.Id, task.ETaskSource, task.TaskDate);
                                     downloadStatusType = site.getPageData(task.MinPage);
-
                                 }
-
                                 else if (task.ETaskSource == "WinwinProfessional")
                                 {
                                     WinwinProfessional site = new WinwinProfessional(task.Id);
@@ -192,15 +185,10 @@ namespace CMCore.task
 
                                 }
                                 break;
-
-                             
                         }
                         break;
                 }
-
-
             }
-
             catch (Exception ex)
             {
                 downloadStatusType = TTaskStatusType.Failed;
@@ -209,10 +197,6 @@ namespace CMCore.task
             }
              
         }
- 
-        
-
-         
-
+  
     }
 }

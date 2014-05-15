@@ -54,6 +54,7 @@ namespace CMCore.site
                 if (myDriver == null)
                     return TTaskStatusType.DriverError;
                 TTaskStatusType downloadStatusType = getSitePageData(MinPage,type);
+                release(downloadStatusType.ToString());
                 return downloadStatusType;
             }
             catch (Exception ex)
@@ -70,13 +71,16 @@ namespace CMCore.site
             string Url = MinPage;
 
             if (MinPage == "" || MinPage == "0")
+            {
                 Url = getBasePageUrl(type);
 
-            if (!driverUtils.NevigateToPage(myDriver.WebDriver, Url))
-            {
-                release(TTaskStatusType.Failed.ToString());
-                return TTaskStatusType.DriverError;
+                if (!driverUtils.NevigateToPage(myDriver.WebDriver, Url))
+                {
+                    release(TTaskStatusType.Failed.ToString());
+                    return TTaskStatusType.DriverError;
+                }
             }
+            else goToPage(curPage, type);
             return getMainTableData(curPage,type);
         }
 
@@ -126,7 +130,7 @@ namespace CMCore.site
                     return TTaskStatusType.Failed;
                 }
                 bool IsTableFinish = false;
-
+                driverUtils.CloseOtherWindows(myDriver.WebDriver);
                 for (; i < randomNumber; i++)
                 {
                     IsTableFinish = mDataSet.IsTableFinish();

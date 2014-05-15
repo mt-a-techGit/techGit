@@ -54,17 +54,19 @@ namespace CMCore.site
             int curPage = 0;
             int.TryParse(MinPage, out curPage);
             string Url = MinPage;
-
             if (MinPage == "" || MinPage == "0")
+            {
                 Url = getBasePageUrl();
 
-            if (!driverUtils.NevigateToPage(myDriver.WebDriver, Url))
-            {
-                release(TTaskStatusType.Failed.ToString());
-                return TTaskStatusType.DriverError;
+                if (!driverUtils.NevigateToPage(myDriver.WebDriver, Url))
+                {
+                    release(TTaskStatusType.Failed.ToString());
+                    return TTaskStatusType.DriverError;
+                }
             }
-
+            else goToPage(curPage);
             return getMainTableData(curPage);
+         
         }
 
         private bool goToPage(int pageNum)
@@ -84,6 +86,7 @@ namespace CMCore.site
             while (true)
             {
                 List<IWebElement> mainTableRows = getBasisTable();
+                driverUtils.CloseOtherWindows(myDriver.WebDriver);
                 if (mainTableRows == null)
                 {
                     release(TTaskStatusType.Failed.ToString());

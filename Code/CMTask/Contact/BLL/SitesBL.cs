@@ -26,6 +26,36 @@ namespace BLL.BLL
             this.infoLog = infoLog;
         }
 
+        public DataTable addNadlanRentTable(DataTable NadlanRentTable)
+        {
+            if (NadlanRentTable.Rows.Count == 0)
+                return null;
+            try
+            {
+                StringBuilder commandText = new StringBuilder("");
+                string cols = getTableCols(NadlanRentTable);
+                string rowsValues = getRowsValues(NadlanRentTable);
+                commandText.Append(" CREATE TEMP TABLE NadlanRentTable(" + cols + ");");
+                commandText.Append(" INSERT INTO NadlanRentTable (" + cols + " ) ");
+                commandText.Append(" SELECT " + rowsValues + ";");
+                commandText.Append(" INSERT INTO NadlanRent (" + cols + " ) ");
+                commandText.Append("  SELECT * FROM NadlanRentTable WHERE NOT EXISTS ");
+                commandText.Append(" (SELECT * FROM NadlanRent WHERE NadlanRent.Address = NadlanRentTable.Address AND NadlanRent.Type = NadlanRentTable.Type AND NadlanRent.EntrenceDate = NadlanRentTable.EntrenceDate    ");
+                commandText.Append(" AND  NadlanRent.Rooms = NadlanRentTable.Rooms AND NadlanRent.City = NadlanRentTable.City AND NadlanRent.Floor = NadlanRentTable.Floor AND NadlanRent.Phone1 = NadlanRentTable.Phone1 ");
+                commandText.Append(" AND  NadlanRent.Name = NadlanRentTable.Name AND NadlanRent.Price = NadlanRentTable.Price AND NadlanRent.phone2 = NadlanRentTable.phone2 AND NadlanRent.RowDate = NadlanRentTable.RowDate );");
+                commandText.Append(" DROP TABLE NadlanRentTable");
+                if (helper.Load(commandText.ToString(), "") == true)
+                    return null;
+                return null;
+            }
+            catch (Exception ex)
+            {
+                errorLog.handleException(ex);
+                errorLog.writeToLogFile("at UpdateWinwinTableRowsStatus  " + ex.StackTrace);
+                return null;
+            }
+        }
+
         public DataTable UpdateHomelessClassesTableRowsStatus(DataTable HomelessClassesTable)
         {
             if (HomelessClassesTable.Rows.Count == 0)

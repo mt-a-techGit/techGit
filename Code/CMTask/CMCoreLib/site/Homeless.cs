@@ -55,6 +55,7 @@ namespace CMCore.site
                 if (myDriver == null)
                     return TTaskStatusType.DriverError;
                 TTaskStatusType downloadStatusType = getSitePageData(MinPage);
+                release(downloadStatusType.ToString());
                 return downloadStatusType;
             }
             catch (Exception ex)
@@ -257,8 +258,9 @@ namespace CMCore.site
 
                 while (true)
                 {
-
+                    driverUtils.Sleep(15000, 17000);
                     List<IWebElement> mainTableRows = getBasisTable();
+                    driverUtils.CloseOtherWindows(myDriver.WebDriver);
                     if (mainTableRows == null)
                     {
                         release(TTaskStatusType.Failed.ToString());
@@ -269,6 +271,12 @@ namespace CMCore.site
                     if (dateRowsCount > 0)
                     {
                         begin = true;
+                        System.Collections.ObjectModel.ReadOnlyCollection<IWebElement> fancybox = myDriver.WebDriver.FindElements(By.ClassName("fancybox-item"));
+                        if (fancybox.Count > 0)
+                        {
+                            fancybox[0].Click();
+                            continue;          
+                        }
                         for (; i < randomNumber; i++)
                         {
                             myDriver.WebDriver.SwitchTo().DefaultContent();
@@ -277,7 +285,12 @@ namespace CMCore.site
                                 break;
                             if (!getRandomRowData(mainTableRows))
                             {
-                                writePageData();
+                               
+                                if (i > 0)
+                                {
+                                    writePageData();
+                                    driverUtils.screeshot(myDriver.WebDriver, "..//screenShot//taskName" + taskId + "_" + DateTime.Now.Hour.ToString() + DateTime.Now.Minute.ToString() + DateTime.Now.Second.ToString() + ".jpg");
+                                } 
                                 release(TTaskStatusType.Failed.ToString());
                                 return TTaskStatusType.Failed;
                             }
