@@ -50,7 +50,7 @@ namespace CMCore.task
 
         }
 
-        int maxTasksNum =3;
+        int maxTasksNum =5;
         BLL.BLL.TaskBL tasksBL;
 
         public void updateTasks()
@@ -68,7 +68,7 @@ namespace CMCore.task
                     int Id = 0;
                     int.TryParse(tasks.Rows[i]["Id"].ToString(), out Id);
                     Process ffmpeg = new Process();
-                    ffmpeg.StartInfo.FileName = @"C:\Project\techGit\Code\CMTask\CM\bin\Debug\CM.exe";
+                    ffmpeg.StartInfo.FileName = @"C:\Users\MTA-Tech1\Desktop\Code1905\CMTask\CM\bin\Debug\CM.exe";
                     ffmpeg.StartInfo.Arguments = tasks.Rows[i]["Id"].ToString();
                     ffmpeg.Start();
                 }

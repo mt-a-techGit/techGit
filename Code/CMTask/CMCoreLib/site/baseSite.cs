@@ -27,7 +27,10 @@ namespace CMCore.site
         HomelessClasses,
         WinwinVehicle,
         HomelessVehicle,
-        NadlanRent
+        NadlanRent,
+        AdVehicle,
+        NadlanSale,
+        Freelancerim
     }
 
     public abstract class baseSite

@@ -44,29 +44,12 @@ namespace BLL.BLL
             catch (Exception ex)
             {
                 errorLog.handleException(ex);
-                errorLog.writeToLogFile("at DB UpdateTaskStatus");
+                errorLog.writeToLogFile("at DB SetProxyStatus");
                 return false;
             }
         }
 
-        private bool UpdateTaskStatus(int TaskId)
-        {
-            try
-            {
-                string commandText = @"UPDATE tasks SET CurrentState=(SELECT Id FROM TaskStatus WHERE (Status = @TaskStatus)), LastInUse = datetime()	WHERE Id = " + TaskId;
-                helper = new dBHelper(connectionString);
-                if (helper.Load(commandText, "") == true)
-                    return true;
-                return false;
-            }
-            catch (Exception ex)
-            {
-                errorLog.handleException(ex);
-                errorLog.writeToLogFile("at DB UpdateTaskStatus");
-                return false;
-            }
-        }
-
+   
         private string DateTimeSQLite(DateTime datetime)
         {
             string dd = DateTime.Now.ToString("yyyy-MM-dd");

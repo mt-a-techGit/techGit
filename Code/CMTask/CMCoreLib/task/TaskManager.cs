@@ -98,8 +98,10 @@ namespace CMCore.task
                     case "HomelessVehicle":
                     case "WinwinVehicle":
                     case "NadlanRent":
-                        string url = "";
-
+                    case "AdVehicle":
+                    case "NadlanSale":
+                    case "Freelancerim":
+                        
                         switch (task.TaskName)
                         {
                             case "GetPageData":
@@ -109,7 +111,21 @@ namespace CMCore.task
                                     Y2 site = new Y2(task.Id, task.ETaskSource, task.TaskDate,task.CityName);
                                     downloadStatusType = site.getPageData(task.MinPage);
                                 }
-
+                                else if (task.ETaskSource == "Freelancerim")
+                                {
+                                    Freelancerim site = new Freelancerim(task.Id);
+                                    downloadStatusType = site.getPageData(task.MinPage);
+                                }
+                                else if (task.ETaskSource == "NadlanSale")
+                                {
+                                    NadlanSale site = new NadlanSale(task.Id, task.ETaskSource, task.TaskDate);
+                                    downloadStatusType = site.getPageData(task.MinPage);
+                                }
+                                else if (task.ETaskSource == "AdVehicle")
+                                {
+                                    adVehicle site = new adVehicle(task.Id, task.ETaskSource, task.TaskDate);
+                                    downloadStatusType = site.getPageData(task.MinPage);
+                                }
                                 else if (task.ETaskSource == "NadlanRent")
                                 {
                                     nadlanRent site = new nadlanRent(task.Id, task.ETaskSource, task.TaskDate);
@@ -122,7 +138,7 @@ namespace CMCore.task
                                 }
                                 else if (task.ETaskSource == "WinwinVehicle")
                                 {
-                                    WinwinVehicle site = new WinwinVehicle(task.Id, task.TaskDate);
+                                    WinwinVehicle site = new WinwinVehicle(task.Id, task.TaskDate,task.CityName);
                                     downloadStatusType = site.getPageData(task.MinPage);
                                 }
                                 else if (task.ETaskSource == "HomelessVehicle")

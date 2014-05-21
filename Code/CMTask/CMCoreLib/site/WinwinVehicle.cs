@@ -19,20 +19,28 @@ namespace CMCore.site
         private int compareDate = -2;
         private DateTime pageDate = DateTime.MinValue;
       
-        internal WinwinVehicle(int taskId, DateTime pageDate)
+        internal WinwinVehicle(int taskId, DateTime pageDate,string city )
             : base(taskId, @"WinwinVehicle\errorHandlerLog\", "WinwinVehicle.log", @"WinwinVehicle\infoHandlerLog\", "WinwinVehicle.log", TSites.WinwinVehicle.ToString())
         {
             this.pageDate = pageDate;
+            this.city = city;
         }
  
-        public static string getPageUrl()
-        {
-            return "http://www.winwin.co.il/Cars/Search/SearchResults/CarPage.aspx?search=eaec151e206931536a77eb277a3b1bf6";
-        }
+        
 
-        public static string getBasePageUrl()
+        public   string getBasePageUrl()
         {
-            return "http://www.winwin.co.il/Cars/Search/SearchResults/CarPage.aspx?search=eaec151e206931536a77eb277a3b1bf6";
+            if (city == "ירושלים")
+                return "http://www.winwin.co.il/Cars/Search/SearchResults/CarPage.aspx?search=eaec151e206931536a77eb277a3b1bf6";
+            else if (city == "תל אביב יפו")
+                return "http://www.winwin.co.il/Cars/Search/SearchResults/CarPage.aspx?search=58705be295d4ae60b888692a69503b90";
+            else if (city == "חולון")
+                return "http://www.winwin.co.il/Cars/Search/SearchResults/CarPage.aspx?search=8a5929cfda3e0636837504fa0977243c";
+            else if (city == "פתח תקווה")
+                return "http://www.winwin.co.il/Cars/Search/SearchResults/CarPage.aspx?search=c7d9ef8f835b6b24badf4a1d6cf3bb64";
+            else if (city == "רמת השרון")
+                return "http://www.winwin.co.il/Cars/Search/SearchResults/CarPage.aspx?search=85e71baa4b37ef9c0c8008537dd93b95";
+            else return "";
         }
 
         public TTaskStatusType getPageData(string MinPage)
@@ -58,6 +66,7 @@ namespace CMCore.site
 
             if (MinPage == "" || MinPage == "0")
             {
+                curPage = 1;
                 Url = getBasePageUrl();
                 if (!driverUtils.NevigateToPage(myDriver.WebDriver, Url))
                 {
@@ -78,8 +87,20 @@ namespace CMCore.site
 
         private bool goToPage(int pageNum)
         {
-            return driverUtils.NevigateToPage(myDriver.WebDriver, "http://www.winwin.co.il/Cars/Search/SearchResults/CarPage.aspx?PageNumberBottom=" + pageNum + "&PageNumberTop=" + pageNum + "&search=eaec151e206931536a77eb277a3b1bf6");
-        }
+            if (city == "ירושלים")
+                return driverUtils.NevigateToPage(myDriver.WebDriver, "http://www.winwin.co.il/Cars/Search/SearchResults/CarPage.aspx?PageNumberBottom=" + pageNum + "&PageNumberTop=" + pageNum + "&search=eaec151e206931536a77eb277a3b1bf6");
+            else if (city == "תל אביב יפו")
+                return driverUtils.NevigateToPage(myDriver.WebDriver, "http://www.winwin.co.il/Cars/Search/SearchResults/CarPage.aspx?PageNumberBottom=" + pageNum + "&PageNumberTop=" + pageNum + "&search=58705be295d4ae60b888692a69503b90");
+            else if (city == "חולון")
+                return driverUtils.NevigateToPage(myDriver.WebDriver, "http://www.winwin.co.il/Cars/Search/SearchResults/CarPage.aspx?PageNumberBottom=" + pageNum + "&PageNumberTop=" + pageNum + "&search=8a5929cfda3e0636837504fa0977243c");
+            else if (city == "פתח תקווה")
+                return driverUtils.NevigateToPage(myDriver.WebDriver, "http://www.winwin.co.il/Cars/Search/SearchResults/CarPage.aspx?PageNumberBottom=" + pageNum + "&PageNumberTop=" + pageNum + "&search=c7d9ef8f835b6b24badf4a1d6cf3bb64");
+
+            else if (city == "רמת השרון")
+                return driverUtils.NevigateToPage(myDriver.WebDriver, "http://www.winwin.co.il/Cars/Search/SearchResults/CarPage.aspx?PageNumberBottom=" + pageNum + "&PageNumberTop=" + pageNum + "&search=85e71baa4b37ef9c0c8008537dd93b95");
+            else
+                return false;
+       }
 
         private TTaskStatusType getMainTableData(int curPage)
         {
@@ -91,9 +112,9 @@ namespace CMCore.site
             bool isTaskFinish = false;
 
             while (true)
-            {
+            {   driverUtils.CloseOtherWindows(myDriver.WebDriver);
                 List<IWebElement> mainTableRows = getBasisTable();
-                driverUtils.CloseOtherWindows(myDriver.WebDriver);
+                
                 if (mainTableRows == null)
                 {
                     release(TTaskStatusType.Failed.ToString());
@@ -358,8 +379,6 @@ namespace CMCore.site
                 DataTable taskTable = new DataTable();
                 List<IWebElement> mainTableRows = new List<IWebElement>();
                 getMainTableRows(Tables[0], mainTableRows);
-               
-                getMainTableRows(Tables[2], mainTableRows);
                 initPageTable(mainTableRows, "True");
                 if (mainTableRows == null)
                     return null;

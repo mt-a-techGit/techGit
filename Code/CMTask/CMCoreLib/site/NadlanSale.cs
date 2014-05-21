@@ -1,4 +1,5 @@
-﻿using System;
+﻿ 
+using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
@@ -17,7 +18,7 @@ using BLL.BLL;
   
 namespace CMCore.site
 {
-    class nadlanRent : baseSite
+    class NadlanSale : baseSite
     {
         public const string mainTableId = "savedAddsTable";
         private IWebElement main_table;
@@ -25,8 +26,8 @@ namespace CMCore.site
         private DateTime pageDate = DateTime.MinValue;
              private int compareDate = -2;
         
-        internal nadlanRent(int taskId, string ETaskSource, DateTime pageDate)
-            : base(taskId, @"nadlanRent\errorHandlerLog\", "nadlanRent.log", @"nadlanRent\infoHandlerLog\", "nadlanRent.log", ETaskSource)
+        internal NadlanSale(int taskId, string ETaskSource, DateTime pageDate)
+            : base(taskId, @"NadlanSale\errorHandlerLog\", "NadlanSale.log", @"NadlanSale\infoHandlerLog\", "NadlanSale.log", ETaskSource)
         {
             
             this.pageDate = pageDate;
@@ -35,13 +36,13 @@ namespace CMCore.site
 
         public static string getPageUrl(string pageNum)
         {
-            return "http://www.ad.co.il/nadlanrent?pageindex="+pageNum;
+            return "http://www.ad.co.il/NadlanSale?pageindex="+pageNum;
         }
 
      
         public static string getBasePageUrl()
         {
-            return "http://www.ad.co.il/nadlanrent";
+            return "http://www.ad.co.il/NadlanSale";
         }
 
         public TTaskStatusType getPageData(string curPage)
@@ -75,7 +76,8 @@ namespace CMCore.site
                 myDriver.WebDriver.SwitchTo().DefaultContent();
                  for (int i = 0; i < lines.Count; i++)
                 {
-                    string source = lines[i].GetAttribute("data-src");
+                    
+                     string source = lines[i].GetAttribute("data-src");
                     if (source == "1")
                         source = "Yad2";
                     else if (source == "2")
@@ -118,9 +120,12 @@ namespace CMCore.site
                     string price = lines[i].GetAttribute("data-price");
                     string area = lines[i].GetAttribute("data-salearea");
                     string type = lines[i].GetAttribute("data-saletype");
-                    taskTable.Rows.Add(type, "Yad2", entrenceDate, areasize, veranda, rooms, city, floor,address, area, hood, phone1, contact, price, phone2, desc, tmpDate.ToShortDateString(), "Success", taskId);
+                    taskTable.Rows.Add(type,source, entrenceDate, areasize, veranda, rooms, city, floor,address, area, hood, phone1, contact, price, phone2, desc, tmpDate.ToShortDateString(), "Success", taskId);
+                     
+                   
                 } 
-                SitesBL.addNadlanRentTable(taskTable);
+                    
+                    SitesBL.addNadlanSaleTable(taskTable);
                 return TTaskStatusType.Success;
             }
             catch (Exception ex)
@@ -162,7 +167,7 @@ namespace CMCore.site
                     return stat;
 
             }
-            if (TaskBL.AddTask(1, "GetPageData", CMLib.DateTimeSQLite(pageDate), "", TSites.NadlanRent.ToString(), page.ToString()))
+            if (TaskBL.AddTask(1, "GetPageData", CMLib.DateTimeSQLite(pageDate), "", TSites.NadlanSale.ToString(), page.ToString()))
                 return TTaskStatusType.Success;
             return TTaskStatusType.Failed;
         }

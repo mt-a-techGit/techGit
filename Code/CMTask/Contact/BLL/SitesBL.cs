@@ -26,6 +26,119 @@ namespace BLL.BLL
             this.infoLog = infoLog;
         }
 
+        public DataTable UpdateFreelancerimTableRowsStatus(DataTable FreelancerimTable)
+        {
+            if (FreelancerimTable.Rows.Count == 0)
+                return null;
+            try
+            {
+                StringBuilder commandText = new StringBuilder("");
+                string cols = getTableCols(FreelancerimTable);
+                string rowsValues = getRowsValues(FreelancerimTable);
+                commandText.Append(" CREATE TEMP TABLE FreelancerimPageTable(" + cols + ");");
+                commandText.Append(" INSERT INTO FreelancerimPageTable (" + cols + " ) ");
+                commandText.Append(" SELECT " + rowsValues);
+                commandText.Append(" ;");
+                commandText.Append(" SELECT Url, Name, (SELECT count(Id) FROM Freelancerim WHERE FreelancerimPageTable.Url = Url AND FreelancerimPageTable.Name = Name ");
+                commandText.Append(" ) AS countRows FROM FreelancerimPageTable ;");
+                commandText.Append("  DROP TABLE   FreelancerimPageTable");
+                if (helper.Load(commandText.ToString(), "") == true)
+                    return helper.DataSet.Tables[0];
+                return null;
+            }
+            catch (Exception ex)
+            {
+                errorLog.handleException(ex);
+                errorLog.writeToLogFile("at UpdateFreelancerimTableRowsStatus  " + ex.StackTrace);
+                return null;
+            }
+        }
+
+
+        public bool AddFreelancerimPageTable(DataTable FreelancerimTable)
+        {
+            try
+            {
+                if (FreelancerimTable.Rows.Count == 0)
+                    return true;
+                string cols = getTableCols(FreelancerimTable);
+                StringBuilder commandText = new StringBuilder("");
+                commandText.Append("INSERT INTO Freelancerim (" + cols + " ) ");
+                string rowsValues = getRowsValues(FreelancerimTable);
+                commandText.Append("  SELECT " + rowsValues);
+
+                if (helper.Load(commandText.ToString(), "") == true)
+                    return true;
+                return false;
+            }
+            catch (Exception ex)
+            {
+                errorLog.handleException(ex);
+                errorLog.writeToLogFile("at AddHomelessVehiclePageTable  " + ex.StackTrace);
+                return false;
+            }
+        }
+
+        public DataTable addAdVehicleTable(DataTable AdVehicleTable)
+        {
+            if (AdVehicleTable.Rows.Count == 0)
+                return null;
+            try
+            {
+                StringBuilder commandText = new StringBuilder("");
+                string cols = getTableCols(AdVehicleTable);
+                string rowsValues = getRowsValues(AdVehicleTable);
+                commandText.Append(" CREATE TEMP TABLE AdVehicleTable(" + cols + ");");
+                commandText.Append(" INSERT INTO AdVehicleTable (" + cols + " ) ");
+                commandText.Append(" SELECT " + rowsValues + ";");
+                commandText.Append(" INSERT INTO AdVehicle (" + cols + " ) ");
+                commandText.Append("  SELECT * FROM AdVehicleTable WHERE NOT EXISTS ");
+                commandText.Append(" (SELECT * FROM AdVehicle WHERE AdVehicle.Manufacture = AdVehicleTable.Manufacture AND AdVehicle.Model = AdVehicleTable.Model AND AdVehicle.Year = AdVehicleTable.Year    ");
+                commandText.Append(" AND  AdVehicle.City = AdVehicleTable.City AND AdVehicle.Price = AdVehicleTable.Price AND AdVehicle.Name = AdVehicleTable.Name AND AdVehicle.Phone1 = AdVehicleTable.Phone1 ");
+                commandText.Append("  AND AdVehicle.phone2 = AdVehicleTable.phone2 AND AdVehicle.RowDate = AdVehicleTable.RowDate );");
+                commandText.Append(" DROP TABLE AdVehicleTable;");
+                if (helper.Load(commandText.ToString(), "") == true)
+                    return null;
+                return null;
+            }
+            catch (Exception ex)
+            {
+                errorLog.handleException(ex);
+                errorLog.writeToLogFile("at UpdateWinwinTableRowsStatus  " + ex.StackTrace);
+                return null;
+            }
+        }
+
+        public DataTable addNadlanSaleTable(DataTable NadlanSaleTable)
+        {
+            if (NadlanSaleTable.Rows.Count == 0)
+                return null;
+            try
+            {
+                StringBuilder commandText = new StringBuilder("");
+                string cols = getTableCols(NadlanSaleTable);
+                string rowsValues = getRowsValues(NadlanSaleTable);
+                commandText.Append(" CREATE TEMP TABLE NadlanSaleTable(" + cols + ");");
+                commandText.Append(" INSERT INTO NadlanSaleTable (" + cols + " ) ");
+                commandText.Append(" SELECT " + rowsValues + ";");
+                commandText.Append(" INSERT INTO NadlanSale (" + cols + " ) ");
+                commandText.Append("  SELECT * FROM NadlanSaleTable WHERE NOT EXISTS ");
+                commandText.Append(" (SELECT * FROM NadlanSale WHERE NadlanSale.Address = NadlanSaleTable.Address AND NadlanSale.Type = NadlanSaleTable.Type AND NadlanSale.EntrenceDate = NadlanSaleTable.EntrenceDate    ");
+                commandText.Append(" AND  NadlanSale.Rooms = NadlanSaleTable.Rooms AND NadlanSale.City = NadlanSaleTable.City AND NadlanSale.Floor = NadlanSaleTable.Floor AND NadlanSale.Phone1 = NadlanSaleTable.Phone1 ");
+                commandText.Append(" AND  NadlanSale.Name = NadlanSaleTable.Name AND NadlanSale.Price = NadlanSaleTable.Price AND NadlanSale.phone2 = NadlanSaleTable.phone2 AND NadlanSale.RowDate = NadlanSaleTable.RowDate );");
+                commandText.Append(" DROP TABLE NadlanSaleTable");
+                if (helper.Load(commandText.ToString(), "") == true)
+                    return null;
+                return null;
+            }
+            catch (Exception ex)
+            {
+                errorLog.handleException(ex);
+                errorLog.writeToLogFile("at UpdateWinwinTableRowsStatus  " + ex.StackTrace);
+                return null;
+            }
+        }
+
         public DataTable addNadlanRentTable(DataTable NadlanRentTable)
         {
             if (NadlanRentTable.Rows.Count == 0)

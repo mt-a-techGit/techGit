@@ -151,9 +151,19 @@ namespace CMCore.site
             try
             {
                 myDriver.WebDriver.SwitchTo().DefaultContent();
-                System.Collections.ObjectModel.ReadOnlyCollection<IWebElement> fancybox = myDriver.WebDriver.FindElements(By.ClassName("fancybox-item"));
-                if (fancybox.Count > 0)
-                    fancybox[0].Click();
+
+                try
+                {
+
+                    System.Collections.ObjectModel.ReadOnlyCollection<IWebElement> fancybox = myDriver.WebDriver.FindElements(By.ClassName("fancybox-item"));
+                    if (fancybox.Count > 0)
+                    {
+                        fancybox[0].Click();
+
+                    }
+
+                }
+                catch (Exception ex) { }
                 main_table = myDriver.WebDriver.FindElement(By.Id(mainTableId));
                 List<IWebElement> mainTableRows = getMainTableRows();
                 if (mainTableRows == null)
@@ -207,6 +217,7 @@ namespace CMCore.site
                 myDriver.WebDriver.SwitchTo().DefaultContent();
                 rowNum = mDataSet.getRandomOpenRowNum(mainTableRows.Count, pageDate);
                 string frameId = clickRow(mainTableRows, rowNum);
+                driverUtils.Sleep(5000, 7000);
                 if (frameId == string.Empty)
                     return false;
                 bool status = getRowData(mDataSet.GetRow(rowNum), frameId);
@@ -244,7 +255,7 @@ namespace CMCore.site
         {
             try
             {
-                int from = 1 + 1, to = 1, cur = 1;
+                int from = 1 + 1, to = 1, cur = 50;
                 if (newMinPage != "")
                 {
                     string tmp = newMinPage.Replace("http://www.homeless.co.il/rent/", "");
@@ -258,39 +269,63 @@ namespace CMCore.site
 
                 while (true)
                 {
-                    driverUtils.Sleep(15000, 17000);
+                    driverUtils.Sleep(5000, 7000);
+
                     List<IWebElement> mainTableRows = getBasisTable();
-                    driverUtils.CloseOtherWindows(myDriver.WebDriver);
+                    //driverUtils.refreshPage(myDriver.WebDriver);
                     if (mainTableRows == null)
                     {
+                        try
+                        {
+
+                            System.Collections.ObjectModel.ReadOnlyCollection<IWebElement> fancybox = myDriver.WebDriver.FindElements(By.ClassName("fancybox-item"));
+                            if (fancybox.Count > 0)
+                            {
+                                fancybox[0].Click();
+                                continue;
+                            }
+
+                        }
+                        catch (Exception ex) { }
+
                         release(TTaskStatusType.Failed.ToString());
                         return TTaskStatusType.Failed;
                     }
+                    driverUtils.CloseOtherWindows(myDriver.WebDriver);
                     int dateRowsCount = mDataSet.dateRowsCount(pageDate, out isTaskFinish);
                     bool IsTableFinish = false;
                     if (dateRowsCount > 0)
                     {
                         begin = true;
-                        System.Collections.ObjectModel.ReadOnlyCollection<IWebElement> fancybox = myDriver.WebDriver.FindElements(By.ClassName("fancybox-item"));
-                        if (fancybox.Count > 0)
-                        {
-                            fancybox[0].Click();
-                            continue;          
-                        }
+
                         for (; i < randomNumber; i++)
                         {
+
                             myDriver.WebDriver.SwitchTo().DefaultContent();
                             IsTableFinish = mDataSet.IsTableFinish(pageDate);
                             if (IsTableFinish)
                                 break;
+                            
                             if (!getRandomRowData(mainTableRows))
                             {
-                               
+                                try
+                                {
+
+                                    System.Collections.ObjectModel.ReadOnlyCollection<IWebElement> fancybox = myDriver.WebDriver.FindElements(By.ClassName("fancybox-item"));
+                                    if (fancybox.Count > 0)
+                                    {
+                                        fancybox[0].Click();
+                                        i--;
+                                        continue;
+                                    }
+
+                                }
+                                catch (Exception ex) { }
                                 if (i > 0)
                                 {
                                     writePageData();
                                     driverUtils.screeshot(myDriver.WebDriver, "..//screenShot//taskName" + taskId + "_" + DateTime.Now.Hour.ToString() + DateTime.Now.Minute.ToString() + DateTime.Now.Second.ToString() + ".jpg");
-                                } 
+                                }
                                 release(TTaskStatusType.Failed.ToString());
                                 return TTaskStatusType.Failed;
                             }
@@ -311,18 +346,25 @@ namespace CMCore.site
                     else
                     {
                         myDriver.WebDriver.SwitchTo().DefaultContent();
-                        System.Collections.ObjectModel.ReadOnlyCollection<IWebElement> fancybox = myDriver.WebDriver.FindElements(By.ClassName("fancybox-item"));
-                        if (fancybox.Count > 0)
+                        try
                         {
-                            fancybox[0].Click();
-                            continue;
+
+                            System.Collections.ObjectModel.ReadOnlyCollection<IWebElement> fancybox = myDriver.WebDriver.FindElements(By.ClassName("fancybox-item"));
+                            if (fancybox.Count > 0)
+                            {
+                                fancybox[0].Click();
+                                continue;
+                            }
+
                         }
+                        catch (Exception ex) { }
+
                         if (compareDate == -2)
                         {
-                            release(TTaskStatusType.Failed.ToString()); 
+                            release(TTaskStatusType.Failed.ToString());
                             return TTaskStatusType.Failed;
                         }
-                           
+
                         if (compareDate == 1)
                         {
                             release(TTaskStatusType.Success.ToString());
@@ -334,7 +376,8 @@ namespace CMCore.site
                     if (!goToPage(cur))
                     {
                         release(TTaskStatusType.Failed.ToString());
-                        return TTaskStatusType.Failed; }
+                        return TTaskStatusType.Failed;
+                    }
                 }
             }
             catch (Exception ex)
@@ -405,13 +448,14 @@ namespace CMCore.site
             compareDate = -2;
             try
             {
+
                 System.Collections.ObjectModel.ReadOnlyCollection<IWebElement> TableTrs = main_table.FindElements(By.XPath(".//tr"));
                 List<IWebElement> mainTableTrs = new List<IWebElement>();
                 int ind = 0;
                 foreach (IWebElement curTr in TableTrs)
                 {
                     ind++;
-                    if (ind == 1)
+                    if (ind == 1 || curTr.Text.Trim() == "")
                         continue;
                     System.Collections.ObjectModel.ReadOnlyCollection<IWebElement> TableTds = curTr.FindElements(By.XPath(".//td"));
                     if (TableTds.Count < 10)
@@ -419,7 +463,8 @@ namespace CMCore.site
 
                     string dd = TableTds[10].Text;
                     DateTime rowDate = DateTime.MaxValue;
-                    DateTime.TryParse(dd, out rowDate);
+                    if (!DateTime.TryParse(dd, out rowDate))
+                        return null;
                     mainTableTrs.Add(curTr);
                     if (compareDate != 0)
                         compareDate = comparePageDate(rowDate);
@@ -452,6 +497,7 @@ namespace CMCore.site
                 if (rowTd == null || rowTd.Count < 12)
                     return string.Empty;
                 rowTd[4].Click();
+                driverUtils.Sleep(5000, 6000);
                 mDataSet.AddEntry(rowNum, SiteDataSet.sOpenStatus, SiteDataSet.sRunningInternalDownloadStatus);
                 string id = mainTableRows[rowNum].GetAttribute("id");
                 string detailsId = id.Replace("ad_", "addetails_");

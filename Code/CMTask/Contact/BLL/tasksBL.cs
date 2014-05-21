@@ -46,7 +46,6 @@ namespace BLL.BLL
         {
             try
             {
-
                 // Determin the DataAdapter = CommandText + Connection
                 string commandText = @"UPDATE tasks SET CurrentState=(SELECT Id FROM TaskStatus WHERE (Status = '" + TaskStatus + "')), LastInUse = datetime()	WHERE Id = " + TaskId;
 
@@ -106,6 +105,24 @@ namespace BLL.BLL
             {
                 errorLog.handleException(ex);
                 errorLog.writeToLogFile("at AddTask  " + ex.StackTrace);
+                return false;
+            }
+        }
+
+        public bool AddTaskByTaskId(int Priority, int taskId, string MinPage)
+        {
+            try
+            {
+                StringBuilder commandText = new StringBuilder(" ");
+                commandText.Append(" INSERT INTO Tasks(CurrentState, Priority, TaskType, LastInUse, TaskDate,City,MinPage)");
+                commandText.Append("  SELECT  (SELECT  Id from TaskStatus WHERE Status='Waiting') AS CurrentState, ");
+                commandText.Append("  Priority,TaskType,null,TaskDate,City," + MinPage + " From Tasks WHERE Tasks.Id="+taskId.ToString());
+                return helper.Load(commandText.ToString().Trim(), "");
+            }
+            catch (Exception ex)
+            {
+                errorLog.handleException(ex);
+                errorLog.writeToLogFile("at AddTaskByTaskId  " + ex.StackTrace);
                 return false;
             }
         }

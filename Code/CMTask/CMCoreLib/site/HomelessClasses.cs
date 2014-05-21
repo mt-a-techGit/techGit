@@ -150,9 +150,8 @@ namespace CMCore.site
 
                 if (i == randomNumber)
                 {
-                    string url = myDriver.WebDriver.Url;
                     release(TTaskStatusType.Success.ToString());
-                    if (TaskBL.AddTask(1, "GetPageData", CMLib.DateTimeSQLite(DateTime.Now), "0", TSites.WinwinProfessional.ToString(), curPage.ToString()))
+                    if (TaskBL.AddTaskByTaskId(1, taskId, curPage.ToString()))
                         return TTaskStatusType.Success;
                     return TTaskStatusType.Failed;
 
@@ -175,7 +174,6 @@ namespace CMCore.site
             }
         }
 
-
         private bool getRandomRowData()
         {
             int rowNum = 0;
@@ -185,14 +183,19 @@ namespace CMCore.site
                 rowNum = mDataSet.getRandomOpenRowNum(out url);
                 if (url == "")
                     return false;
-                if (!driverUtils.NevigateToPage(myDriver.WebDriver,url))
-                    return false;
-                bool status = getRowData(mDataSet.GetRow(rowNum));
-                if (status)
-                    mDataSet.SetDownloadStatusForRow(rowNum, SiteDataSet.sSsuccessInternalDownloadStatus);
-                else
-                    mDataSet.SetDownloadStatusForRow(rowNum, SiteDataSet.sFailedInternalDownloadStatus);
-                return status;
+                for (int i = 0; i < 2; i++)
+                {
+                    if (!driverUtils.NevigateToPage(myDriver.WebDriver, url))
+                        return false;
+                    bool status = getRowData(mDataSet.GetRow(rowNum));
+                    if (status)
+                    {
+                        mDataSet.SetDownloadStatusForRow(rowNum, SiteDataSet.sSsuccessInternalDownloadStatus);
+                        return true;
+                    }
+                }
+                mDataSet.SetDownloadStatusForRow(rowNum, SiteDataSet.sFailedInternalDownloadStatus);
+                return false;
             }
             catch (Exception ex)
             {

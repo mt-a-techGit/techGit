@@ -231,15 +231,16 @@ namespace CMCore.site
             bool isTaskFinish = false;
 
             while (true)
-            {
+            { 
+                if(!driverUtils.CloseOtherWindows(myDriver.WebDriver))
+                    return TTaskStatusType.Failed;
                 List<IWebElement> mainTableRows = getBasisTable();
                 if (mainTableRows == null)
                 {
                      release(TTaskStatusType.Failed.ToString());
                     return TTaskStatusType.Failed;
                 }
-                if(!driverUtils.CloseOtherWindows(myDriver.WebDriver))
-                    return TTaskStatusType.Failed;
+              
                 int dateRowsCount = mDataSet.dateRowsCount(pageDate, out isTaskFinish);
                 bool IsTableFinish = false;
                 if (dateRowsCount > 0)

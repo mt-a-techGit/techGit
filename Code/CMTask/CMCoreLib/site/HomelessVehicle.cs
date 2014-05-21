@@ -39,7 +39,7 @@ namespace CMCore.site
  
         public static string getBasePageUrl()
         {
-            return "http://www.homeless.co.il/private/";
+            return "http://www.homeless.co.il/private/4";
         }
 
         public TTaskStatusType getPageData(string MinPage)
@@ -425,9 +425,10 @@ namespace CMCore.site
                     if (TableTds.Count<10)
                         continue;
                     
-                    string dd = TableTds[10].Text;
+                    string dd = TableTds[9].Text;
                     DateTime rowDate = DateTime.MaxValue;
-                    DateTime.TryParse(dd, out rowDate);
+                    if (!DateTime.TryParse(dd, out rowDate))
+                        return null;
                     mainTableTrs.Add(curTr);
                     if (compareDate != 0)
                           compareDate = comparePageDate(rowDate);
@@ -466,6 +467,7 @@ namespace CMCore.site
                 if (rowTd == null || rowTd.Count < 11)
                     return string.Empty;
                 rowTd[4].Click();
+                driverUtils.Sleep(5000, 6000);
                 mDataSet.AddEntry(rowNum, SiteDataSet.sOpenStatus, SiteDataSet.sRunningInternalDownloadStatus);
                 string id = mainTableRows[rowNum].GetAttribute("id");
                 string detailsId = id.Replace("ad_", "addetails_");
