@@ -109,7 +109,7 @@ namespace BLL.BLL
                 commandText.Append(" AND  ETaskSource.Name in('WinwinVehicle','Winwin','WinwinProfessional')) ELSE 0 END) as TypeCount,");
                 commandText.Append(" Tasks.Id , TaskName,Name , TaskDate, CityName, TaskType AS CurType, MinPage FROM Tasks INNER JOIN  TaskTypes ON Tasks.TaskType = TaskTypes.Id INNER JOIN ");
                 commandText.Append(" ETaskSource ON TaskTypes.ETaskSource = ETaskSource.Id LEFT JOIN Cities ON Cities.Id = Tasks.City   ");
-                commandText.Append(" WHERE (tasktype=4 or tasktype>16) AND (select count(*)  from tasks where currentState=4)<" + maxTasks + " AND   TypeCount <" + (maxTasks - 1) + " AND CurrentState = (SELECT Id FROM TaskStatus WHERE (Status = 'Waiting') )  AND (");
+                commandText.Append(" WHERE   (select count(*)  from tasks where currentState=4)<" + maxTasks + " AND   TypeCount <" + (maxTasks - 1) + " AND CurrentState = (SELECT Id FROM TaskStatus WHERE (Status = 'Waiting') )  AND (");
                 commandText.Append(" SELECT COUNT(Id) FROM Tasks WHERE CurType = TaskType AND  ");
                 commandText.Append(" CurrentState = (SELECT Id FROM TaskStatus  WHERE (Status = 'Process'))  ) <" + (maxTasks));
                 commandText.Append(" ORDER BY RANDOM()  LIMIT 1; ");

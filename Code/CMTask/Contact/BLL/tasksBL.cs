@@ -25,6 +25,43 @@ namespace BLL.BLL
             this.infoLog = infoLog;
         }
 
+        public DataTable getDunsguideTypeDetails()
+        {
+            try
+            {
+                StringBuilder commandText = new StringBuilder("  ");
+                commandText.Append(" SELECT   Category, Baseurl,MinPage ");
+                commandText.Append(" FROM DunsguideType WHERE Status='Working'  ORDER BY RANDOM()  LIMIT 1; ");
+
+                if (helper.Load(commandText.ToString(), "") == true)
+                    return helper.DataSet.Tables[0];
+                return null;
+            }
+            catch (Exception ex)
+            {
+                errorLog.handleException(ex);
+                errorLog.writeToLogFile("at DB GetTasks");
+                return null;
+            }
+        }
+
+        public bool updateDunsguideTypeTaskMinPage(string Category, string MinPage)
+        {
+            try
+            {
+                StringBuilder commandText = new StringBuilder(" ");
+                commandText.Append(" UPDATE DunsguideType  SET MinPage='" + MinPage + "' WHERE Category='" + Category.ToString() + "'");
+                return (helper.Load(commandText.ToString(), ""));
+
+            }
+            catch (Exception ex)
+            {
+                errorLog.handleException(ex);
+                errorLog.writeToLogFile("at updateTaskMinPage  " + ex.StackTrace);
+                return false;
+            }
+        }
+
         public bool updateTaskMinPage(int taskId, string MinPage)
         {
             try

@@ -48,7 +48,7 @@ namespace CMCore.task
         {
             tasksBL = new TaskBL(errorLog, infoLog);
         }
- 
+
         BLL.BLL.TaskBL tasksBL;
 
         public void getTask(string taskId)
@@ -101,20 +101,48 @@ namespace CMCore.task
                     case "AdVehicle":
                     case "NadlanSale":
                     case "Freelancerim":
-                        
+                    case "Directors":
+                    case "DirectorsMembers":
+                    case "Dunsguide":
+                    case "MnewsBusinesscards":
                         switch (task.TaskName)
                         {
                             case "GetPageData":
 
                                 if (task.ETaskSource == "Yad2")
                                 {
-                                    Y2 site = new Y2(task.Id, task.ETaskSource, task.TaskDate,task.CityName);
+                                    Y2 site = new Y2(task.Id, task.ETaskSource, task.TaskDate, task.CityName);
+                                    downloadStatusType = site.getPageData(task.MinPage);
+                                }
+                                else if (task.ETaskSource == "MnewsBusinesscards")
+                                {
+                                    MnewsBusinesscards site = new MnewsBusinesscards(task.Id);
                                     downloadStatusType = site.getPageData(task.MinPage);
                                 }
                                 else if (task.ETaskSource == "Freelancerim")
                                 {
                                     Freelancerim site = new Freelancerim(task.Id);
                                     downloadStatusType = site.getPageData(task.MinPage);
+                                }
+                                else if (task.ETaskSource == "Directors")
+                                {
+                                    Directors site = new Directors(task.Id);
+                                    downloadStatusType = site.getPageData(task.MinPage);
+                                }
+                                else if (task.ETaskSource == "DirectorsMembers")
+                                {
+                                    DirectorsMembers site = new DirectorsMembers(task.Id);
+                                    site.getPageData(task.MinPage);
+                                }
+                                else if (task.ETaskSource == "Dunsguide")
+                                {
+                                    BLL.BLL.TaskBL BLTask = new BLL.BLL.TaskBL(errorLog, infoLog);
+                                    DataTable DunsguideTypeDetails = BLTask.getDunsguideTypeDetails();
+                                    if (DunsguideTypeDetails == null || DunsguideTypeDetails.Rows.Count == 0)
+                                        return;
+                                    Dunsguide site = new Dunsguide(task.Id, DunsguideTypeDetails.Rows[0]["Category"].ToString());
+                                    downloadStatusType = site.getPageData(DunsguideTypeDetails.Rows[0]["MinPage"].ToString(), DunsguideTypeDetails.Rows[0]["Baseurl"].ToString());
+
                                 }
                                 else if (task.ETaskSource == "NadlanSale")
                                 {
@@ -138,7 +166,7 @@ namespace CMCore.task
                                 }
                                 else if (task.ETaskSource == "WinwinVehicle")
                                 {
-                                    WinwinVehicle site = new WinwinVehicle(task.Id, task.TaskDate,task.CityName);
+                                    WinwinVehicle site = new WinwinVehicle(task.Id, task.TaskDate, task.CityName);
                                     downloadStatusType = site.getPageData(task.MinPage);
                                 }
                                 else if (task.ETaskSource == "HomelessVehicle")
@@ -211,8 +239,8 @@ namespace CMCore.task
                 errorLogTask.handleException(ex);
                 errorLogTask.writeToLogFile("at DB GetTasks");
             }
-             
+
         }
-  
+
     }
 }

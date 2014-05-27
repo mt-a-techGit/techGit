@@ -121,7 +121,7 @@ namespace CMCore.site
                         phone1 = phone;
                         phone2 = "";
                     }
-                    string desc = lines[i].GetAttribute("data-desc").Replace("'", " ").Replace('"', ' ');
+                    string desc = lines[i].GetAttribute("data-desc").Replace("'", "''");
 
 
                     taskTable.Rows.Add(source, Manufacture, Model, Year, Hand, Odometer, Gear, CarEngine, EngineCapacity, Ownership, Area, City, Price, Name, phone1, phone2, desc, tmpDate.ToShortDateString(), "Success", taskId);
@@ -163,6 +163,8 @@ namespace CMCore.site
                 if (stat == TTaskStatusType.Success)
                 {
                     page++;
+                    if (page == 2274)
+                        return TTaskStatusType.Success;
                     base.TaskBL.updateTaskMinPage(taskId, page.ToString());
                     //updatetaskMinPage()
                     url = getPageUrl(page.ToString());

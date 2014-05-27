@@ -60,10 +60,10 @@ namespace CMCore.site
             return cols;
         }
 
-        private void writePageData()
+        private bool writePageData()
         {
             mDataSet.filterDate(pageDate);
-            SitesBL.AddWinwinPageTable(mDataSet.GetPageTable());
+            return SitesBL.AddWinwinPageTable(mDataSet.GetPageTable());
         }
 
         private List<IWebElement> getBasisTable()
@@ -75,7 +75,8 @@ namespace CMCore.site
                 List<IWebElement> mainTableRows = getMainTableRows();
                 if (mainTableRows == null)
                     return null;
-                initPageTable(mainTableRows);
+                if (!initPageTable(mainTableRows))
+                    return null;
                 return mainTableRows;
             }
             catch (Exception ex)
@@ -260,7 +261,8 @@ namespace CMCore.site
                     }
                     if (i > 0)
                     {
-                        writePageData();
+                        if (!writePageData())
+                            return TTaskStatusType.Failed; 
                         driverUtils.screeshot(myDriver.WebDriver, "..//screenShot//taskName" + taskId + "_" + DateTime.Now.Hour.ToString() + DateTime.Now.Minute.ToString() + DateTime.Now.Second.ToString() + ".jpg");
 
                     }
@@ -385,7 +387,7 @@ namespace CMCore.site
             {
                 if (rowsTd[i].Text.Trim() != "")
                 {
-                    tableRow[ind] = rowsTd[i].Text.Replace("'", " ").Replace('"', ' ');
+                    tableRow[ind] = rowsTd[i].Text.Replace("'", "''");
                     ind++;
                 }
             }
@@ -476,7 +478,7 @@ namespace CMCore.site
             }
         }
 
-        private void initPageTable(List<IWebElement> mainTableRows)
+        private bool initPageTable(List<IWebElement> mainTableRows)
         {
             try
             {
@@ -495,8 +497,11 @@ namespace CMCore.site
                 if (compareDate == 0)
                 {
                     taskTable = SitesBL.UpdateWinwinTableRowsStatus(mDataSet.GetClonePageTable());
+                    if (taskTable == null)
+                        return false;
                     mDataSet.setTable(taskTable);
                 }
+                return true;
             }
             catch (Exception ex)
             {

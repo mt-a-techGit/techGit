@@ -140,7 +140,8 @@ namespace CMCore.site
                    }
                    if (i > 0)
                    {
-                       writePageData();
+                       if (!writePageData())
+                           return TTaskStatusType.Failed; 
                        driverUtils.screeshot(myDriver.WebDriver, "..//screenShot//taskName" + taskId + "_" + DateTime.Now.Hour.ToString() + DateTime.Now.Minute.ToString() + DateTime.Now.Second.ToString() + ".jpg");
                    }
                    if (i == randomNumber)
@@ -172,10 +173,10 @@ namespace CMCore.site
             }
         }
 
-        private void writePageData()
+        private bool writePageData()
         {
             mDataSet.filter();
-            SitesBL.AddWinwinVehiclePageTable(mDataSet.GetPageTable());
+           return  SitesBL.AddWinwinVehiclePageTable(mDataSet.GetPageTable());
         }
 
         private bool getRandomRowData(List<IWebElement> mainTableRows)
@@ -239,9 +240,9 @@ namespace CMCore.site
                     {
                         pageTableRow["Ownership"] = rowText.Replace("בעלות:", "").Trim();
                     }
-                    else if (rowText.Replace('"', ' ').IndexOf("ק מ:") > -1)
+                    else if (rowText.IndexOf("ק מ:") > -1)
                     {
-                        pageTableRow["Odometer"] = rowText.Replace('"', ' ').Replace("ק מ:", "").Trim();
+                        pageTableRow["Odometer"] = rowText.Replace("ק מ:", "").Trim();
                     }
                     else if (rowText.IndexOf("בעלות") > -1)
                     {
@@ -359,7 +360,7 @@ namespace CMCore.site
             {
                 if (rowsTd[i].Text.Trim() != "")
                 {
-                    tableRow[ind] = rowsTd[i].Text.Replace("'", " ").Replace('"', ' ').Trim();
+                    tableRow[ind] = rowsTd[i].Text.Replace("'", "''").Trim();
                     ind++;
                 }
             }
@@ -383,6 +384,8 @@ namespace CMCore.site
                 if (mainTableRows == null)
                     return null;
                 taskTable = SitesBL.UpdateWinwinVehicleTableRowsStatus(mDataSet.GetClonePageTable());
+                if (taskTable == null)
+                    return null;
                 mDataSet.setWinwinVehicleTable(taskTable);
 
                 return mainTableRows;

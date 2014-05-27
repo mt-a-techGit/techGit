@@ -74,10 +74,10 @@ namespace CMCore.site
                 return false;
            return true;
         }
-        private void writePageData()
+        private bool writePageData()
         {
             mDataSet.filter();
-            SitesBL.AddFreelancerimPageTable(mDataSet.GetPageTable());
+            return SitesBL.AddFreelancerimPageTable(mDataSet.GetPageTable());
         }
 
         private TTaskStatusType getMainTableData(int curPage)
@@ -110,7 +110,8 @@ namespace CMCore.site
                 }
                 if (i > 0)
                 {
-                    writePageData();
+                    if(!writePageData())
+                        return TTaskStatusType.Failed; 
                 }
 
                 if (i == randomNumber)

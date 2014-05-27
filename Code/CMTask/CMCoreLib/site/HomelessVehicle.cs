@@ -96,17 +96,17 @@ namespace CMCore.site
 
                         pageTableRow["Agency"] = "True";
                     }
-                    else if (lines[i].Text.Replace("'", " ").IndexOf("קילומטראז :") > -1)
+                    else if (lines[i].Text.Replace("'", "''").IndexOf("קילומטראז :") > -1)
                     {
                        
-                        string myString = lines[i].Text.Replace("'", " ").Replace("קילומטראז :", string.Empty).Trim();
+                        string myString = lines[i].Text.Replace("'", "''").Replace("קילומטראז :", string.Empty).Trim();
                         pageTableRow["Odometer"] = myString;
 
                     }
-                    else if (lines[i].Text.Replace("'", " ").IndexOf("קילומטראז :") > -1)
+                    else if (lines[i].Text.Replace("'", "''").IndexOf("קילומטראז :") > -1)
                     {
                   
-                        string myString = lines[i].Text.Replace("'", " ").Replace("קילומטראז :", string.Empty).Trim();
+                        string myString = lines[i].Text.Replace("'", "''").Replace("קילומטראז :", string.Empty).Trim();
                         pageTableRow["Odometer"] = myString;
 
                     }
@@ -139,7 +139,7 @@ namespace CMCore.site
                 }
                 System.Collections.ObjectModel.ReadOnlyCollection<IWebElement> freeTextlines = myDriver.WebDriver.FindElements(By.ClassName("remarks"));
                 if (freeTextlines.Count > 0)
-                    pageTableRow["freeText"] = freeTextlines[0].Text.Replace("'", " ").Replace('"', ' ');
+                    pageTableRow["freeText"] = freeTextlines[0].Text.Replace("'", "''");
 
                 return true;
             }
@@ -163,7 +163,8 @@ namespace CMCore.site
                 List<IWebElement> mainTableRows = getMainTableRows();
                 if (mainTableRows == null)
                     return null;
-                initPageTable(mainTableRows);
+                if (!initPageTable(mainTableRows))
+                    return null;
                 return mainTableRows;
             }
             catch (Exception ex)
@@ -174,7 +175,7 @@ namespace CMCore.site
             }
         }
 
-        private void initPageTable(List<IWebElement> mainTableRows)
+        private bool initPageTable(List<IWebElement> mainTableRows)
         {
             try
             {
@@ -192,7 +193,10 @@ namespace CMCore.site
                 }
               
                     taskTable = SitesBL.UpdateHomelessVehicleTableRowsStatus(mDataSet.GetClonePageTable());
+                    if (taskTable == null)
+                        return false;
                     mDataSet.setHomelessVehicleTable(taskTable);
+                    return true;
                
             }
             catch (Exception ex)
@@ -304,7 +308,8 @@ namespace CMCore.site
                         }
                         if (i > 0)
                         {
-                            writePageData();
+                            if (!writePageData())
+                                return TTaskStatusType.Failed; 
                             driverUtils.screeshot(myDriver.WebDriver, "..//screenShot//taskName" + taskId + "_" + DateTime.Now.Hour.ToString() + DateTime.Now.Minute.ToString() + DateTime.Now.Second.ToString() + ".jpg");
                         }
                         if (i == randomNumber)
@@ -386,10 +391,10 @@ namespace CMCore.site
 
         }
 
-        private void writePageData()
+        private bool writePageData()
         {
             mDataSet.filterDate(pageDate);
-            SitesBL.AddHomelessVehiclePageTable(mDataSet.GetPageTable());
+            return  SitesBL.AddHomelessVehiclePageTable(mDataSet.GetPageTable());
         }
 
     
@@ -402,7 +407,7 @@ namespace CMCore.site
             {
                 if (i!=0 && i!=10&& i!=8 && i!=7)
                 {
-                    tableRow[ind] = rowsTd[i].Text.Replace("'", " ").Replace('"', ' ');
+                    tableRow[ind] = rowsTd[i].Text.Replace("'", "''");
                     ind++;
                 }
             }

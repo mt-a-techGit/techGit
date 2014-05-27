@@ -104,10 +104,10 @@ namespace CMCore.site
             }
             return false;
         }
-        private void writePageData()
+        private bool writePageData()
         {
             mDataSet.filter();
-            SitesBL.AddHomelessClassesPageTable(mDataSet.GetPageTable());
+            return SitesBL.AddHomelessClassesPageTable(mDataSet.GetPageTable());
         }
 
         private TTaskStatusType getMainTableData(int curPage,string type)
@@ -145,7 +145,8 @@ namespace CMCore.site
                 }
                 if (i > 0)
                 {
-                    writePageData();
+                    if (!writePageData())
+                        return TTaskStatusType.Failed; 
                 }
 
                 if (i == randomNumber)

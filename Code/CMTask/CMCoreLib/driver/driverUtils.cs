@@ -86,11 +86,11 @@ namespace CMCore.site
                 Proxy proxy = new Proxy();
                 proxy.HttpProxy = httpProxy;
                 proxy.IsAutoDetect = false;
-                DesiredCapabilities capabilities = new DesiredCapabilities();
-                capabilities.SetCapability(CapabilityType.Proxy, proxy);
-                IWebDriver webDriver = new FirefoxDriver(capabilities);
-
-                return webDriver;
+                FirefoxProfileManager profileManager = new FirefoxProfileManager();
+                FirefoxProfile profile = profileManager.GetProfile("selenium");
+                profile.SetProxyPreferences(proxy);
+                IWebDriver driver = new FirefoxDriver(profile);
+                return driver;
             }
             catch (Exception ex)
             {
