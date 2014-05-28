@@ -40,6 +40,115 @@ namespace CMCore.data
             return SiteDataSet.sSsuccessInternalDownloadStatus;
         }
 
+        internal void setFreelancerimTable(DataTable newTable)
+        {
+            try
+            {
+                for (int j = 0; j < mPageTable.Rows.Count; j++)
+                {
+                    mPageTable.Rows[j][sInternalDownloadStatus] = "Waiting";
+                    for (int i = 0; i < newTable.Rows.Count; i++)
+                    {
+                        if (newTable.Rows[i]["url"].ToString() == mPageTable.Rows[j]["url"].ToString() &&
+                            newTable.Rows[i]["Name"].ToString() == mPageTable.Rows[j]["Name"].ToString() &&
+                            newTable.Rows[i]["countRows"].ToString() != "0"
+                           )
+                        {
+                            mPageTable.Rows[j][sInternalDownloadStatus] = "Done";
+                            break;
+                        }
+                    }
+                }
+            }
+            catch (Exception ex)
+            {
+                errorLog.handleException(ex);
+                errorLog.writeToLogFile("at setFreelancerimTable  " + ex.StackTrace);
+            }
+        }
+
+        internal void setMnewsBusinesscardsTable(DataTable newTable)
+        {
+            try
+            {
+                for (int j = 0; j < mPageTable.Rows.Count; j++)
+                {
+                    mPageTable.Rows[j][sInternalDownloadStatus] = "Waiting";
+                    for (int i = 0; i < newTable.Rows.Count; i++)
+                    {
+                        if (newTable.Rows[i]["Name"].ToString() == mPageTable.Rows[j]["Name"].ToString() &&
+                            newTable.Rows[i]["url"].ToString() == mPageTable.Rows[j]["url"].ToString() &&
+                            newTable.Rows[i]["countRows"].ToString() != "0"
+                           )
+                        {
+                            mPageTable.Rows[j][sInternalDownloadStatus] = "Done";
+                            break;
+                        }
+                    }
+                }
+            }
+            catch (Exception ex)
+            {
+                errorLog.handleException(ex);
+                errorLog.writeToLogFile("at setFreelancerimTable  " + ex.StackTrace);
+            }
+        }
+    
+
+        internal void setDunsguideTable(DataTable newTable)
+        {
+            try
+            {
+                for (int j = 0; j < mPageTable.Rows.Count; j++)
+                {
+                    mPageTable.Rows[j][sInternalDownloadStatus] = "Waiting";
+                    for (int i = 0; i < newTable.Rows.Count; i++)
+                    {
+                        if (newTable.Rows[i]["Name"].ToString() == mPageTable.Rows[j]["Name"].ToString() &&
+                            newTable.Rows[i]["url"].ToString() == mPageTable.Rows[j]["url"].ToString() &&
+                            newTable.Rows[i]["countRows"].ToString() != "0"
+                           )
+                        {
+                            mPageTable.Rows[j][sInternalDownloadStatus] = "Done";
+                            break;
+                        }
+                    }
+                }
+            }
+            catch (Exception ex)
+            {
+                errorLog.handleException(ex);
+                errorLog.writeToLogFile("at setFreelancerimTable  " + ex.StackTrace);
+            }
+        }
+
+        internal void setDirectorsTable(DataTable newTable)
+        {
+            try
+            {
+                for (int j = 0; j < mPageTable.Rows.Count; j++)
+                {
+                    mPageTable.Rows[j][sInternalDownloadStatus] = "Waiting";
+                    for (int i = 0; i < newTable.Rows.Count; i++)
+                    {
+                        if (newTable.Rows[i]["CompanyName"].ToString() == mPageTable.Rows[j]["CompanyName"].ToString() &&
+                            newTable.Rows[i]["url"].ToString() == mPageTable.Rows[j]["url"].ToString() &&
+                            newTable.Rows[i]["countRows"].ToString() != "0"
+                           )
+                        {
+                            mPageTable.Rows[j][sInternalDownloadStatus] = "Done";
+                            break;
+                        }
+                    }
+                }
+            }
+            catch (Exception ex)
+            {
+                errorLog.handleException(ex);
+                errorLog.writeToLogFile("at setFreelancerimTable  " + ex.StackTrace);
+            }
+        }
+      
         internal int dateRowsCount(DateTime date,out bool isTaskFinish)
         {
             DateTime minRowDate = DateTime.MinValue;

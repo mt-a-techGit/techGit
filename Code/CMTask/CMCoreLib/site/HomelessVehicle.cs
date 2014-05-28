@@ -39,7 +39,7 @@ namespace CMCore.site
  
         public static string getBasePageUrl()
         {
-            return "http://www.homeless.co.il/private/";
+            return "http://www.homeless.co.il/private/4";
         }
 
         public TTaskStatusType getPageData(string MinPage)
@@ -49,6 +49,7 @@ namespace CMCore.site
             if (myDriver == null)
                 return TTaskStatusType.DriverError;
             TTaskStatusType downloadStatusType = getSitePageData(MinPage);
+            release(downloadStatusType.ToString());
             return downloadStatusType;
             }
             catch (Exception ex)
@@ -95,17 +96,17 @@ namespace CMCore.site
 
                         pageTableRow["Agency"] = "True";
                     }
-                    else if (lines[i].Text.Replace("'", " ").IndexOf("קילומטראז :") > -1)
+                    else if (lines[i].Text.Replace("'", "''").IndexOf("קילומטראז :") > -1)
                     {
                        
-                        string myString = lines[i].Text.Replace("'", " ").Replace("קילומטראז :", string.Empty).Trim();
+                        string myString = lines[i].Text.Replace("'", "''").Replace("קילומטראז :", string.Empty).Trim();
                         pageTableRow["Odometer"] = myString;
 
                     }
-                    else if (lines[i].Text.Replace("'", " ").IndexOf("קילומטראז :") > -1)
+                    else if (lines[i].Text.Replace("'", "''").IndexOf("קילומטראז :") > -1)
                     {
                   
-                        string myString = lines[i].Text.Replace("'", " ").Replace("קילומטראז :", string.Empty).Trim();
+                        string myString = lines[i].Text.Replace("'", "''").Replace("קילומטראז :", string.Empty).Trim();
                         pageTableRow["Odometer"] = myString;
 
                     }
@@ -138,7 +139,7 @@ namespace CMCore.site
                 }
                 System.Collections.ObjectModel.ReadOnlyCollection<IWebElement> freeTextlines = myDriver.WebDriver.FindElements(By.ClassName("remarks"));
                 if (freeTextlines.Count > 0)
-                    pageTableRow["freeText"] = freeTextlines[0].Text.Replace("'", " ").Replace('"', ' ');
+                    pageTableRow["freeText"] = freeTextlines[0].Text.Replace("'", "''");
 
                 return true;
             }
@@ -162,7 +163,8 @@ namespace CMCore.site
                 List<IWebElement> mainTableRows = getMainTableRows();
                 if (mainTableRows == null)
                     return null;
-                initPageTable(mainTableRows);
+                if (!initPageTable(mainTableRows))
+                    return null;
                 return mainTableRows;
             }
             catch (Exception ex)
@@ -173,7 +175,7 @@ namespace CMCore.site
             }
         }
 
-        private void initPageTable(List<IWebElement> mainTableRows)
+        private bool initPageTable(List<IWebElement> mainTableRows)
         {
             try
             {
@@ -191,7 +193,10 @@ namespace CMCore.site
                 }
               
                     taskTable = SitesBL.UpdateHomelessVehicleTableRowsStatus(mDataSet.GetClonePageTable());
+                    if (taskTable == null)
+                        return false;
                     mDataSet.setHomelessVehicleTable(taskTable);
+                    return true;
                
             }
             catch (Exception ex)
@@ -274,6 +279,7 @@ namespace CMCore.site
                 {
 
                     List<IWebElement> mainTableRows = getBasisTable();
+                    driverUtils.CloseOtherWindows(myDriver.WebDriver);
                     if (mainTableRows == null)
                     {
                         release(TTaskStatusType.Failed.ToString());
@@ -302,7 +308,8 @@ namespace CMCore.site
                         }
                         if (i > 0)
                         {
-                            writePageData();
+                            if (!writePageData())
+                                return TTaskStatusType.Failed; 
                             driverUtils.screeshot(myDriver.WebDriver, "..//screenShot//taskName" + taskId + "_" + DateTime.Now.Hour.ToString() + DateTime.Now.Minute.ToString() + DateTime.Now.Second.ToString() + ".jpg");
                         }
                         if (i == randomNumber)
@@ -384,10 +391,10 @@ namespace CMCore.site
 
         }
 
-        private void writePageData()
+        private bool writePageData()
         {
             mDataSet.filterDate(pageDate);
-            SitesBL.AddHomelessVehiclePageTable(mDataSet.GetPageTable());
+            return  SitesBL.AddHomelessVehiclePageTable(mDataSet.GetPageTable());
         }
 
     
@@ -400,7 +407,7 @@ namespace CMCore.site
             {
                 if (i!=0 && i!=10&& i!=8 && i!=7)
                 {
-                    tableRow[ind] = rowsTd[i].Text.Replace("'", " ").Replace('"', ' ');
+                    tableRow[ind] = rowsTd[i].Text.Replace("'", "''");
                     ind++;
                 }
             }
@@ -423,9 +430,10 @@ namespace CMCore.site
                     if (TableTds.Count<10)
                         continue;
                     
-                    string dd = TableTds[10].Text;
+                    string dd = TableTds[9].Text;
                     DateTime rowDate = DateTime.MaxValue;
-                    DateTime.TryParse(dd, out rowDate);
+                    if (!DateTime.TryParse(dd, out rowDate))
+                        return null;
                     mainTableTrs.Add(curTr);
                     if (compareDate != 0)
                           compareDate = comparePageDate(rowDate);
@@ -464,6 +472,7 @@ namespace CMCore.site
                 if (rowTd == null || rowTd.Count < 11)
                     return string.Empty;
                 rowTd[4].Click();
+                driverUtils.Sleep(5000, 6000);
                 mDataSet.AddEntry(rowNum, SiteDataSet.sOpenStatus, SiteDataSet.sRunningInternalDownloadStatus);
                 string id = mainTableRows[rowNum].GetAttribute("id");
                 string detailsId = id.Replace("ad_", "addetails_");

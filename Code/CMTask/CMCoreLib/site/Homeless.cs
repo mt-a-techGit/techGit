@@ -55,6 +55,7 @@ namespace CMCore.site
                 if (myDriver == null)
                     return TTaskStatusType.DriverError;
                 TTaskStatusType downloadStatusType = getSitePageData(MinPage);
+                release(downloadStatusType.ToString());
                 return downloadStatusType;
             }
             catch (Exception ex)
@@ -133,7 +134,7 @@ namespace CMCore.site
                 }
                 System.Collections.ObjectModel.ReadOnlyCollection<IWebElement> freeTextlines = myDriver.WebDriver.FindElements(By.ClassName("remarks"));
                 if (freeTextlines.Count > 0)
-                    pageTableRow["freeText"] = freeTextlines[0].Text.Replace("'", " ").Replace('"', ' ');
+                    pageTableRow["freeText"] = freeTextlines[0].Text.Replace("'", "''");
 
                 return true;
             }
@@ -150,14 +151,25 @@ namespace CMCore.site
             try
             {
                 myDriver.WebDriver.SwitchTo().DefaultContent();
-                System.Collections.ObjectModel.ReadOnlyCollection<IWebElement> fancybox = myDriver.WebDriver.FindElements(By.ClassName("fancybox-item"));
-                if (fancybox.Count > 0)
-                    fancybox[0].Click();
+
+                try
+                {
+
+                    System.Collections.ObjectModel.ReadOnlyCollection<IWebElement> fancybox = myDriver.WebDriver.FindElements(By.ClassName("fancybox-item"));
+                    if (fancybox.Count > 0)
+                    {
+                        fancybox[0].Click();
+
+                    }
+
+                }
+                catch (Exception ex) { }
                 main_table = myDriver.WebDriver.FindElement(By.Id(mainTableId));
                 List<IWebElement> mainTableRows = getMainTableRows();
                 if (mainTableRows == null)
                     return null;
-                initPageTable(mainTableRows);
+                if (!initPageTable(mainTableRows))
+                    return null;
                 return mainTableRows;
             }
             catch (Exception ex)
@@ -168,7 +180,7 @@ namespace CMCore.site
             }
         }
 
-        private void initPageTable(List<IWebElement> mainTableRows)
+        private bool initPageTable(List<IWebElement> mainTableRows)
         {
             try
             {
@@ -187,8 +199,11 @@ namespace CMCore.site
                 if (compareDate == 0)
                 {
                     taskTable = SitesBL.UpdateHomelessTableRowsStatus(mDataSet.GetClonePageTable());
+                    if (taskTable == null)
+                        return false;
                     mDataSet.setHomelessTable(taskTable);
                 }
+                return true;
             }
             catch (Exception ex)
             {
@@ -206,6 +221,7 @@ namespace CMCore.site
                 myDriver.WebDriver.SwitchTo().DefaultContent();
                 rowNum = mDataSet.getRandomOpenRowNum(mainTableRows.Count, pageDate);
                 string frameId = clickRow(mainTableRows, rowNum);
+                driverUtils.Sleep(5000, 7000);
                 if (frameId == string.Empty)
                     return false;
                 bool status = getRowData(mDataSet.GetRow(rowNum), frameId);
@@ -243,7 +259,7 @@ namespace CMCore.site
         {
             try
             {
-                int from = 1 + 1, to = 1, cur = 1;
+                int from = 1 + 1, to = 1, cur = 50;
                 if (newMinPage != "")
                 {
                     string tmp = newMinPage.Replace("http://www.homeless.co.il/rent/", "");
@@ -257,34 +273,71 @@ namespace CMCore.site
 
                 while (true)
                 {
+                    driverUtils.Sleep(5000, 7000);
 
                     List<IWebElement> mainTableRows = getBasisTable();
+                    //driverUtils.refreshPage(myDriver.WebDriver);
                     if (mainTableRows == null)
                     {
+                        try
+                        {
+
+                            System.Collections.ObjectModel.ReadOnlyCollection<IWebElement> fancybox = myDriver.WebDriver.FindElements(By.ClassName("fancybox-item"));
+                            if (fancybox.Count > 0)
+                            {
+                                fancybox[0].Click();
+                                continue;
+                            }
+
+                        }
+                        catch (Exception ex) { }
+
                         release(TTaskStatusType.Failed.ToString());
                         return TTaskStatusType.Failed;
                     }
+                    driverUtils.CloseOtherWindows(myDriver.WebDriver);
                     int dateRowsCount = mDataSet.dateRowsCount(pageDate, out isTaskFinish);
                     bool IsTableFinish = false;
                     if (dateRowsCount > 0)
                     {
                         begin = true;
+
                         for (; i < randomNumber; i++)
                         {
+
                             myDriver.WebDriver.SwitchTo().DefaultContent();
                             IsTableFinish = mDataSet.IsTableFinish(pageDate);
                             if (IsTableFinish)
                                 break;
+                            
                             if (!getRandomRowData(mainTableRows))
                             {
-                                writePageData();
+                                try
+                                {
+
+                                    System.Collections.ObjectModel.ReadOnlyCollection<IWebElement> fancybox = myDriver.WebDriver.FindElements(By.ClassName("fancybox-item"));
+                                    if (fancybox.Count > 0)
+                                    {
+                                        fancybox[0].Click();
+                                        i--;
+                                        continue;
+                                    }
+
+                                }
+                                catch (Exception ex) { }
+                                if (i > 0)
+                                {
+                                    writePageData();
+                                    driverUtils.screeshot(myDriver.WebDriver, "..//screenShot//taskName" + taskId + "_" + DateTime.Now.Hour.ToString() + DateTime.Now.Minute.ToString() + DateTime.Now.Second.ToString() + ".jpg");
+                                }
                                 release(TTaskStatusType.Failed.ToString());
                                 return TTaskStatusType.Failed;
                             }
                         }
                         if (i > 0)
                         {
-                            writePageData();
+                            if (!writePageData())
+                                return TTaskStatusType.Failed; 
                             driverUtils.screeshot(myDriver.WebDriver, "..//screenShot//taskName" + taskId + "_" + DateTime.Now.Hour.ToString() + DateTime.Now.Minute.ToString() + DateTime.Now.Second.ToString() + ".jpg");
                         }
                         if (i == randomNumber)
@@ -298,18 +351,25 @@ namespace CMCore.site
                     else
                     {
                         myDriver.WebDriver.SwitchTo().DefaultContent();
-                        System.Collections.ObjectModel.ReadOnlyCollection<IWebElement> fancybox = myDriver.WebDriver.FindElements(By.ClassName("fancybox-item"));
-                        if (fancybox.Count > 0)
+                        try
                         {
-                            fancybox[0].Click();
-                            continue;
+
+                            System.Collections.ObjectModel.ReadOnlyCollection<IWebElement> fancybox = myDriver.WebDriver.FindElements(By.ClassName("fancybox-item"));
+                            if (fancybox.Count > 0)
+                            {
+                                fancybox[0].Click();
+                                continue;
+                            }
+
                         }
+                        catch (Exception ex) { }
+
                         if (compareDate == -2)
                         {
-                            release(TTaskStatusType.Failed.ToString()); 
+                            release(TTaskStatusType.Failed.ToString());
                             return TTaskStatusType.Failed;
                         }
-                           
+
                         if (compareDate == 1)
                         {
                             release(TTaskStatusType.Success.ToString());
@@ -321,7 +381,8 @@ namespace CMCore.site
                     if (!goToPage(cur))
                     {
                         release(TTaskStatusType.Failed.ToString());
-                        return TTaskStatusType.Failed; }
+                        return TTaskStatusType.Failed;
+                    }
                 }
             }
             catch (Exception ex)
@@ -367,10 +428,10 @@ namespace CMCore.site
 
         }
 
-        private void writePageData()
+        private bool writePageData()
         {
             mDataSet.filterDate(pageDate);
-            SitesBL.AddHomelessPageTable(mDataSet.GetPageTable());
+            return SitesBL.AddHomelessPageTable(mDataSet.GetPageTable());
         }
 
         private void initPageRow(IWebElement row, DataRow tableRow)
@@ -381,7 +442,7 @@ namespace CMCore.site
             {
                 if (rowsTd[i].Text.Trim() != "")
                 {
-                    tableRow[ind] = rowsTd[i].Text.Replace("'", " ").Replace('"', ' ');
+                    tableRow[ind] = rowsTd[i].Text.Replace("'", "''");
                     ind++;
                 }
             }
@@ -392,13 +453,14 @@ namespace CMCore.site
             compareDate = -2;
             try
             {
+
                 System.Collections.ObjectModel.ReadOnlyCollection<IWebElement> TableTrs = main_table.FindElements(By.XPath(".//tr"));
                 List<IWebElement> mainTableTrs = new List<IWebElement>();
                 int ind = 0;
                 foreach (IWebElement curTr in TableTrs)
                 {
                     ind++;
-                    if (ind == 1)
+                    if (ind == 1 || curTr.Text.Trim() == "")
                         continue;
                     System.Collections.ObjectModel.ReadOnlyCollection<IWebElement> TableTds = curTr.FindElements(By.XPath(".//td"));
                     if (TableTds.Count < 10)
@@ -406,7 +468,8 @@ namespace CMCore.site
 
                     string dd = TableTds[10].Text;
                     DateTime rowDate = DateTime.MaxValue;
-                    DateTime.TryParse(dd, out rowDate);
+                    if (!DateTime.TryParse(dd, out rowDate))
+                        return null;
                     mainTableTrs.Add(curTr);
                     if (compareDate != 0)
                         compareDate = comparePageDate(rowDate);
@@ -439,6 +502,7 @@ namespace CMCore.site
                 if (rowTd == null || rowTd.Count < 12)
                     return string.Empty;
                 rowTd[4].Click();
+                driverUtils.Sleep(5000, 6000);
                 mDataSet.AddEntry(rowNum, SiteDataSet.sOpenStatus, SiteDataSet.sRunningInternalDownloadStatus);
                 string id = mainTableRows[rowNum].GetAttribute("id");
                 string detailsId = id.Replace("ad_", "addetails_");

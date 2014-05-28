@@ -54,17 +54,19 @@ namespace CMCore.site
             int curPage = 0;
             int.TryParse(MinPage, out curPage);
             string Url = MinPage;
-
             if (MinPage == "" || MinPage == "0")
+            {
                 Url = getBasePageUrl();
 
-            if (!driverUtils.NevigateToPage(myDriver.WebDriver, Url))
-            {
-                release(TTaskStatusType.Failed.ToString());
-                return TTaskStatusType.DriverError;
+                if (!driverUtils.NevigateToPage(myDriver.WebDriver, Url))
+                {
+                    release(TTaskStatusType.Failed.ToString());
+                    return TTaskStatusType.DriverError;
+                }
             }
-
+            else goToPage(curPage);
             return getMainTableData(curPage);
+         
         }
 
         private bool goToPage(int pageNum)
@@ -84,6 +86,7 @@ namespace CMCore.site
             while (true)
             {
                 List<IWebElement> mainTableRows = getBasisTable();
+                driverUtils.CloseOtherWindows(myDriver.WebDriver);
                 if (mainTableRows == null)
                 {
                     release(TTaskStatusType.Failed.ToString());
@@ -108,7 +111,8 @@ namespace CMCore.site
                 }
                 if (i > 0)
                 {
-                    writePageData();
+                    if (!writePageData())
+                        return TTaskStatusType.Failed; 
                     driverUtils.screeshot(myDriver.WebDriver, "..//screenShot//taskName" + taskId + "_" + DateTime.Now.Hour.ToString() + DateTime.Now.Minute.ToString() + DateTime.Now.Second.ToString() + ".jpg");
                 }
 
@@ -139,10 +143,10 @@ namespace CMCore.site
             }
         }
 
-        private void writePageData()
+        private bool writePageData()
         {
             mDataSet.filter();
-            SitesBL.AddWinwinProfessionalPageTable(mDataSet.GetPageTable());
+            return SitesBL.AddWinwinProfessionalPageTable(mDataSet.GetPageTable());
         }
 
         private bool getRandomRowData(List<IWebElement> mainTableRows)
@@ -276,7 +280,7 @@ namespace CMCore.site
             }
         }
 
-        private void initPageTable(List<IWebElement> mainTableRows)
+        private bool initPageTable(List<IWebElement> mainTableRows)
         {
             try
             {
@@ -294,8 +298,10 @@ namespace CMCore.site
                 }
 
                 taskTable = SitesBL.UpdateWinwinProfessionalTableRowsStatus(mDataSet.GetClonePageTable());
+                if (taskTable == null)
+                    return false;
                 mDataSet.setWinwinProfessionalTable(taskTable);
-
+                return true;
             }
             catch (Exception ex)
             {
@@ -313,7 +319,7 @@ namespace CMCore.site
             {
                 if (rowsTd[i].Text.Trim() != "")
                 {
-                    tableRow[ind] = rowsTd[i].Text.Replace("'", " ").Replace('"', ' ').Trim();
+                    tableRow[ind] = rowsTd[i].Text.Replace("'", "''").Trim();
                     ind++;
                 }
             }
@@ -328,7 +334,8 @@ namespace CMCore.site
                 List<IWebElement> mainTableRows = getMainTableRows();
                 if (mainTableRows == null)
                     return null;
-                initPageTable(mainTableRows);
+                if (!initPageTable(mainTableRows))
+                    return null;
                 return mainTableRows;
             }
             catch (Exception ex)

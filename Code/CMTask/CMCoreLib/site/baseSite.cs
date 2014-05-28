@@ -26,7 +26,15 @@ namespace CMCore.site
         WinwinProfessional,
         HomelessClasses,
         WinwinVehicle,
-        HomelessVehicle
+        HomelessVehicle,
+        NadlanRent,
+        AdVehicle,
+        NadlanSale,
+        Freelancerim,
+        Directors,
+        DirectorsMembers,
+        Dunsguide,
+        MnewsBusinesscards
     }
 
     public abstract class baseSite
@@ -81,15 +89,16 @@ namespace CMCore.site
 
         protected void release(string Status)
         {
-            string stat = "Failed";
+      
+            if (myDriver.WebDriver != null)
+            {
+                string stat = "Failed";
                 if (Status == "Success")
                     stat = "Success";
                 TaskBL.UpdateTaskStatus(taskId, stat);
-            if (myDriver.WebDriver != null)
-            {
                 myDriver.WebDriver.Quit();
                 blProxie.SetProxyStatus("Success", myDriver.httpProxy);
-                
+               
             }
         }
 

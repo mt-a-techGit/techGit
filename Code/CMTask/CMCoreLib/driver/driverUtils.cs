@@ -86,11 +86,11 @@ namespace CMCore.site
                 Proxy proxy = new Proxy();
                 proxy.HttpProxy = httpProxy;
                 proxy.IsAutoDetect = false;
-                DesiredCapabilities capabilities = new DesiredCapabilities();
-                capabilities.SetCapability(CapabilityType.Proxy, proxy);
-                IWebDriver webDriver = new FirefoxDriver(capabilities);
-
-                return webDriver;
+                FirefoxProfileManager profileManager = new FirefoxProfileManager();
+                FirefoxProfile profile = profileManager.GetProfile("selenium");
+                profile.SetProxyPreferences(proxy);
+                IWebDriver driver = new FirefoxDriver(profile);
+                return driver;
             }
             catch (Exception ex)
             {
@@ -113,9 +113,17 @@ namespace CMCore.site
             return webDriver;
         }
 
-        public static void ExecuteScript(IWebDriver driver, string scriptValue)
+        public static string ExecuteScript(IWebDriver driver, string scriptValue)
         {
-            var t = ((IJavaScriptExecutor)driver).ExecuteScript(scriptValue);
+            try
+            {
+                var t = ((IJavaScriptExecutor)driver).ExecuteScript(scriptValue);
+                return t.ToString();
+            }
+            catch (Exception ex)
+            {
+                return "";
+            }
         }
 
         public static void refreshPage(IWebDriver driver)

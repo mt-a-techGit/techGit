@@ -25,6 +25,43 @@ namespace BLL.BLL
             this.infoLog = infoLog;
         }
 
+        public DataTable getDunsguideTypeDetails()
+        {
+            try
+            {
+                StringBuilder commandText = new StringBuilder("  ");
+                commandText.Append(" SELECT   Category, Baseurl,MinPage ");
+                commandText.Append(" FROM DunsguideType WHERE Status='Working'  ORDER BY RANDOM()  LIMIT 1; ");
+
+                if (helper.Load(commandText.ToString(), "") == true)
+                    return helper.DataSet.Tables[0];
+                return null;
+            }
+            catch (Exception ex)
+            {
+                errorLog.handleException(ex);
+                errorLog.writeToLogFile("at DB GetTasks");
+                return null;
+            }
+        }
+
+        public bool updateDunsguideTypeTaskMinPage(string Category, string MinPage)
+        {
+            try
+            {
+                StringBuilder commandText = new StringBuilder(" ");
+                commandText.Append(" UPDATE DunsguideType  SET MinPage='" + MinPage + "' WHERE Category='" + Category.ToString() + "'");
+                return (helper.Load(commandText.ToString(), ""));
+
+            }
+            catch (Exception ex)
+            {
+                errorLog.handleException(ex);
+                errorLog.writeToLogFile("at updateTaskMinPage  " + ex.StackTrace);
+                return false;
+            }
+        }
+
         public bool updateTaskMinPage(int taskId, string MinPage)
         {
             try
@@ -46,7 +83,6 @@ namespace BLL.BLL
         {
             try
             {
-
                 // Determin the DataAdapter = CommandText + Connection
                 string commandText = @"UPDATE tasks SET CurrentState=(SELECT Id FROM TaskStatus WHERE (Status = '" + TaskStatus + "')), LastInUse = datetime()	WHERE Id = " + TaskId;
 
@@ -106,6 +142,24 @@ namespace BLL.BLL
             {
                 errorLog.handleException(ex);
                 errorLog.writeToLogFile("at AddTask  " + ex.StackTrace);
+                return false;
+            }
+        }
+
+        public bool AddTaskByTaskId(int Priority, int taskId, string MinPage)
+        {
+            try
+            {
+                StringBuilder commandText = new StringBuilder(" ");
+                commandText.Append(" INSERT INTO Tasks(CurrentState, Priority, TaskType, LastInUse, TaskDate,City,MinPage)");
+                commandText.Append("  SELECT  (SELECT  Id from TaskStatus WHERE Status='Waiting') AS CurrentState, ");
+                commandText.Append("  Priority,TaskType,null,TaskDate,City," + MinPage + " From Tasks WHERE Tasks.Id="+taskId.ToString());
+                return helper.Load(commandText.ToString().Trim(), "");
+            }
+            catch (Exception ex)
+            {
+                errorLog.handleException(ex);
+                errorLog.writeToLogFile("at AddTaskByTaskId  " + ex.StackTrace);
                 return false;
             }
         }
