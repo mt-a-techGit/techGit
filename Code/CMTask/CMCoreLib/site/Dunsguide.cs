@@ -350,7 +350,7 @@ namespace CMCore.site
                                 i++;
                             }
 
-                            pageTableRow["Subsidiary "] = tmp;
+                            pageTableRow[23] = tmp;
                         }
                     }
 

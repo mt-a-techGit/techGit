@@ -190,31 +190,33 @@ namespace BLL.BLL
                 }
                 commandText.Append("WHERE  CompanyName= '" + row["CompanyName"].ToString().Replace("'", "''") + "' AND url='" + row["url"] + "'; ");
                 //commandText.Append(" where 0=(select count(id) from DirectorsCompany where DirectorsCompany.[CompanyName]='" + row["CompanyName"] + "' AND DirectorsCompany.[url]='" + row["CompanyName"] + "') ;");
-
-                string tmpCommandText = "INSERT INTO DirectorsMembersCompany(MemberId,CompanyId,JobTitle)";
-                for (int i = 0; i < DirectorsMembers.Rows.Count; i++)
+                if (DirectorsMembers.Rows.Count > 0)
                 {
-                    if (i > 0)
-                        tmpCommandText += " Union";
-                    tmpCommandText += " SELECT (select id from DirectorsMembers where Name='" + DirectorsMembers.Rows[i]["Name"].ToString().Replace("'", "''") + "' AND url='" + DirectorsMembers.Rows[i]["url"].ToString().Replace("'", "''") + "'   ),(select id from DirectorsCompany where CompanyName='" + row["CompanyName"].ToString().Replace("'", "''") + "' AND url='" + row["url"].ToString().Replace("'", "''") + "'  ) ,'" + DirectorsMembers.Rows[i]["JobTitle"].ToString() + "'";
+                    string tmpCommandText = "INSERT INTO DirectorsMembersCompany(MemberId,CompanyId,JobTitle)";
+                    for (int i = 0; i < DirectorsMembers.Rows.Count; i++)
+                    {
+                        if (i > 0)
+                            tmpCommandText += " Union";
+                        tmpCommandText += " SELECT (select id from DirectorsMembers where Name='" + DirectorsMembers.Rows[i]["Name"].ToString().Replace("'", "''") + "' AND url='" + DirectorsMembers.Rows[i]["url"].ToString().Replace("'", "''") + "'   ),(select id from DirectorsCompany where CompanyName='" + row["CompanyName"].ToString().Replace("'", "''") + "' AND url='" + row["url"].ToString().Replace("'", "''") + "'  ) ,'" + DirectorsMembers.Rows[i]["JobTitle"].ToString() + "'";
 
+                    }
+
+                    //commandText.Append("INSERT INTO DirectorsCompany (" + cols + " ) ");
+                    //string rowsValues = getRowValues(row);
+                    //commandText.Append("  SELECT " + rowsValues +";");
+                    DirectorsMembers.Columns.Remove("JobTitle");
+                    cols = getTableCols(DirectorsMembers);
+                    string rowsValues = getRowsValues(DirectorsMembers);
+
+                    commandText.Append(" CREATE TEMP TABLE DirectorsMembersTable(" + cols + ");");
+                    commandText.Append(" INSERT INTO DirectorsMembersTable (" + cols + " ) ");
+                    commandText.Append(" SELECT " + rowsValues + ";");
+                    commandText.Append(" INSERT INTO DirectorsMembers (" + cols + " ) ");
+                    commandText.Append("  SELECT * FROM DirectorsMembersTable WHERE NOT EXISTS ");
+                    commandText.Append(" (SELECT * FROM DirectorsMembers WHERE DirectorsMembers.Name = DirectorsMembersTable.Name AND DirectorsMembers.Url = DirectorsMembersTable.Url   );  ");
+                    commandText.Append(" DROP TABLE DirectorsMembersTable;");
+                    commandText.Append(tmpCommandText + ";");
                 }
-
-                //commandText.Append("INSERT INTO DirectorsCompany (" + cols + " ) ");
-                //string rowsValues = getRowValues(row);
-                //commandText.Append("  SELECT " + rowsValues +";");
-                DirectorsMembers.Columns.Remove("JobTitle");
-                cols = getTableCols(DirectorsMembers);
-                string rowsValues = getRowsValues(DirectorsMembers);
-
-                commandText.Append(" CREATE TEMP TABLE DirectorsMembersTable(" + cols + ");");
-                commandText.Append(" INSERT INTO DirectorsMembersTable (" + cols + " ) ");
-                commandText.Append(" SELECT " + rowsValues + ";");
-                commandText.Append(" INSERT INTO DirectorsMembers (" + cols + " ) ");
-                commandText.Append("  SELECT * FROM DirectorsMembersTable WHERE NOT EXISTS ");
-                commandText.Append(" (SELECT * FROM DirectorsMembers WHERE DirectorsMembers.Name = DirectorsMembersTable.Name AND DirectorsMembers.Url = DirectorsMembersTable.Url   );  ");
-                commandText.Append(" DROP TABLE DirectorsMembersTable;");
-                commandText.Append(tmpCommandText + ";");
                 for (int i = 0; i < row.Table.Columns.Count; i++)
                 {
                     if (row.Table.Columns[i].ColumnName == "downloadStatus")
@@ -233,7 +235,32 @@ namespace BLL.BLL
                 return false;
             }
         }
-    
+
+        public bool AddZimmerPageTable(DataTable ZimmerTable)
+        {
+            try
+            {
+                if (ZimmerTable.Rows.Count == 0)
+                    return true;
+                string cols = getTableCols(ZimmerTable);
+                StringBuilder commandText = new StringBuilder("");
+                commandText.Append("INSERT INTO Zimmer (" + cols + " ) ");
+                string rowsValues = getRowsValues(ZimmerTable);
+                commandText.Append("  SELECT " + rowsValues);
+
+                if (helper.Load(commandText.ToString(), "") == true)
+                    return true;
+                return false;
+            }
+            catch (Exception ex)
+            {
+                errorLog.handleException(ex);
+                errorLog.writeToLogFile("at AddZimmerPageTable  " + ex.StackTrace);
+                return false;
+            }
+        }
+
+
         public DataTable UpdateDunsguideTableRowsStatus(DataTable DunsguideTable)
         {
             if (DunsguideTable.Rows.Count == 0)

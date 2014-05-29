@@ -34,7 +34,8 @@ namespace CMCore.site
         Directors,
         DirectorsMembers,
         Dunsguide,
-        MnewsBusinesscards
+        MnewsBusinesscards,
+        Zimmer
     }
 
     public abstract class baseSite

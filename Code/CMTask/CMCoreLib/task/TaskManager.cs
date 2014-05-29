@@ -79,7 +79,7 @@ namespace CMCore.task
         {
             LogFile errorLogTask = new LogFile(@"TaskManager\errorHandlerLog\", "TaskManager.log");
             LogFile infoLogTask = new LogFile(@"TaskManager\infoHandlerLog\", "TaskManager.log");
-            baseSite SiteBase = null;
+           
             TTaskStatusType downloadStatusType = TTaskStatusType.Failed;
             try
             {
@@ -105,33 +105,45 @@ namespace CMCore.task
                     case "DirectorsMembers":
                     case "Dunsguide":
                     case "MnewsBusinesscards":
-                        switch (task.TaskName)
+                    case "Zimmer":
+                    switch (task.TaskName)
                         {
                             case "GetPageData":
 
                                 if (task.ETaskSource == "Yad2")
                                 {
                                     Y2 site = new Y2(task.Id, task.ETaskSource, task.TaskDate, task.CityName);
+                                    
                                     downloadStatusType = site.getPageData(task.MinPage);
                                 }
+                                else if (task.ETaskSource == "Zimmer")
+                                {
+                                    Zimmer site = new Zimmer(task.Id);
+                                    
+                                    downloadStatusType = site.getPageData(task.MinPage);
+                                }   
                                 else if (task.ETaskSource == "MnewsBusinesscards")
                                 {
                                     MnewsBusinesscards site = new MnewsBusinesscards(task.Id);
+                                    
                                     downloadStatusType = site.getPageData(task.MinPage);
                                 }
                                 else if (task.ETaskSource == "Freelancerim")
                                 {
                                     Freelancerim site = new Freelancerim(task.Id);
+                                    
                                     downloadStatusType = site.getPageData(task.MinPage);
                                 }
                                 else if (task.ETaskSource == "Directors")
                                 {
                                     Directors site = new Directors(task.Id);
+                                    
                                     downloadStatusType = site.getPageData(task.MinPage);
                                 }
                                 else if (task.ETaskSource == "DirectorsMembers")
                                 {
                                     DirectorsMembers site = new DirectorsMembers(task.Id);
+                                    
                                     site.getPageData(task.MinPage);
                                 }
                                 else if (task.ETaskSource == "Dunsguide")
@@ -141,90 +153,97 @@ namespace CMCore.task
                                     if (DunsguideTypeDetails == null || DunsguideTypeDetails.Rows.Count == 0)
                                         return;
                                     Dunsguide site = new Dunsguide(task.Id, DunsguideTypeDetails.Rows[0]["Category"].ToString());
+                                    
                                     downloadStatusType = site.getPageData(DunsguideTypeDetails.Rows[0]["MinPage"].ToString(), DunsguideTypeDetails.Rows[0]["Baseurl"].ToString());
 
                                 }
                                 else if (task.ETaskSource == "NadlanSale")
                                 {
                                     NadlanSale site = new NadlanSale(task.Id, task.ETaskSource, task.TaskDate);
+                                    
                                     downloadStatusType = site.getPageData(task.MinPage);
                                 }
                                 else if (task.ETaskSource == "AdVehicle")
                                 {
                                     adVehicle site = new adVehicle(task.Id, task.ETaskSource, task.TaskDate);
+                                    
                                     downloadStatusType = site.getPageData(task.MinPage);
                                 }
                                 else if (task.ETaskSource == "NadlanRent")
                                 {
                                     nadlanRent site = new nadlanRent(task.Id, task.ETaskSource, task.TaskDate);
+                                    
                                     downloadStatusType = site.getPageData(task.MinPage);
                                 }
                                 else if (task.ETaskSource == "Homeless")
                                 {
                                     Homeless site = new Homeless(task.Id, task.ETaskSource, task.TaskDate);
+                                    
                                     downloadStatusType = site.getPageData(task.MinPage);
                                 }
                                 else if (task.ETaskSource == "WinwinVehicle")
                                 {
                                     WinwinVehicle site = new WinwinVehicle(task.Id, task.TaskDate, task.CityName);
+                                    
                                     downloadStatusType = site.getPageData(task.MinPage);
                                 }
                                 else if (task.ETaskSource == "HomelessVehicle")
                                 {
                                     HomelessVehicle site = new HomelessVehicle(task.Id, task.ETaskSource, task.TaskDate);
+                                    
                                     downloadStatusType = site.getPageData(task.MinPage);
                                 }
                                 else if (task.ETaskSource == "WinwinProfessional")
                                 {
                                     WinwinProfessional site = new WinwinProfessional(task.Id);
-                                    SiteBase = site;
+                                    
                                     downloadStatusType = site.getPageData(task.MinPage);
                                 }
                                 else if (task.ETaskSource == "Winwin")
                                 {
                                     Winwin site = new Winwin(task.Id, task.ETaskSource, task.TaskDate, task.CityName);
-                                    SiteBase = site;
+                                    
                                     downloadStatusType = site.getPageData(task.MinPage);
                                 }
                                 else if (task.ETaskSource == "HomelessClasses")
                                 {
                                     HomelessClasses site = new HomelessClasses(task.Id);
-                                    SiteBase = site;
+                                    
                                     downloadStatusType = site.getPageData(task.MinPage, "Classes");
 
                                 }
                                 else if (task.ETaskSource == "HomelessCourses")
                                 {
                                     HomelessClasses site = new HomelessClasses(task.Id);
-                                    SiteBase = site;
+                                    
                                     downloadStatusType = site.getPageData(task.MinPage, "Courses");
 
                                 }
                                 else if (task.ETaskSource == "HomelessWorkshop")
                                 {
                                     HomelessClasses site = new HomelessClasses(task.Id);
-                                    SiteBase = site;
+                                    
                                     downloadStatusType = site.getPageData(task.MinPage, "Workshop");
 
                                 }
                                 else if (task.ETaskSource == "HomelessLecture")
                                 {
                                     HomelessClasses site = new HomelessClasses(task.Id);
-                                    SiteBase = site;
+                                    
                                     downloadStatusType = site.getPageData(task.MinPage, "Lecture");
 
                                 }
                                 else if (task.ETaskSource == "HomelessPrivateClasses")
                                 {
                                     HomelessClasses site = new HomelessClasses(task.Id);
-                                    SiteBase = site;
+                                    
                                     downloadStatusType = site.getPageData(task.MinPage, "PrivateClasses");
 
                                 }
                                 else if (task.ETaskSource == "HomelessMeetings")
                                 {
                                     HomelessClasses site = new HomelessClasses(task.Id);
-                                    SiteBase = site;
+                                    
                                     downloadStatusType = site.getPageData(task.MinPage, "Meetings");
 
                                 }
@@ -238,6 +257,12 @@ namespace CMCore.task
                 downloadStatusType = TTaskStatusType.Failed;
                 errorLogTask.handleException(ex);
                 errorLogTask.writeToLogFile("at DB GetTasks");
+            }
+            finally
+            {
+
+                tasksBL.UpdateTaskStatus(task.Id, downloadStatusType.ToString());
+
             }
 
         }

@@ -128,7 +128,7 @@ namespace CMCore.site
                 }
                 else
                 {
-                    if (curPage == 54)
+                    if (curPage == 51)
                         return TTaskStatusType.Success;
 
                     curPage++;

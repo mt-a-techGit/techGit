@@ -72,6 +72,7 @@
     <Compile Include="site\WinwinProfessional.cs" />
     <Compile Include="site\WinwinVehicle.cs" />
     <Compile Include="site\Y2.cs" />
+    <Compile Include="site\Zimmer.cs" />
     <Compile Include="task\Task.cs" />
     <Compile Include="task\TaskManager.cs" />
     <Compile Include="user_agent\UserAgentProvider.cs" />

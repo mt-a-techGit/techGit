@@ -54,7 +54,10 @@ namespace CMCore.site
                 if (myDriver == null)
                     return TTaskStatusType.DriverError;
                 TTaskStatusType downloadStatusType = getSitePageData(MinPage,type);
-                release(downloadStatusType.ToString());
+                if(downloadStatusType==TTaskStatusType.Success)
+                    release("Success");
+                else
+                    release("Failed");
                 return downloadStatusType;
             }
             catch (Exception ex)
@@ -77,7 +80,7 @@ namespace CMCore.site
                 if (!driverUtils.NevigateToPage(myDriver.WebDriver, Url))
                 {
                     release(TTaskStatusType.Failed.ToString());
-                    return TTaskStatusType.DriverError;
+                    return TTaskStatusType.Failed;
                 }
             }
             else goToPage(curPage, type);

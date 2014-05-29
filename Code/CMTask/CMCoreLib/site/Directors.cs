@@ -70,7 +70,7 @@ namespace CMCore.site
             return getMainTableData(curPage);
         }
 
-        
+
         private void writePageData()
         {
             mDataSet.filter();
@@ -160,6 +160,9 @@ namespace CMCore.site
         {
             try
             {
+                System.Collections.ObjectModel.ReadOnlyCollection<IWebElement> tables = myDriver.WebDriver.FindElements(By.XPath(".//table"));
+                if (tables.Count > 0 && tables[0].Text.IndexOf("ERROR 404") > -1)
+                 return true;  
                 IWebElement main = myDriver.WebDriver.FindElement(By.Id("detailsTbl"));
                 if (main == null)
                     return false;
@@ -189,30 +192,31 @@ namespace CMCore.site
                         pageTableRow["Domain"] = row.Text.Replace("תחום עיסוק:", "").Trim();
 
                 }
-
-                main = myDriver.WebDriver.FindElement(By.Id("ctl00_ContentMain_gridDirectors_GridView1"));
-                if (main == null)
-                    return false;
-                TableTrs = main.FindElements(By.XPath(".//tr"));
-                bool firstRow = true;
                 DataTable PageTable = new DataTable();
                 PageTable.Columns.Add("Name", typeof(string));
                 PageTable.Columns.Add("Url", typeof(string));
                 PageTable.Columns.Add("JobTitle", typeof(string));
                 PageTable.Columns.Add("DownloadStatus", typeof(string));
-                foreach (IWebElement row in TableTrs)
+
+                System.Collections.ObjectModel.ReadOnlyCollection<IWebElement> directors = myDriver.WebDriver.FindElements(By.Id("ctl00_ContentMain_gridDirectors_GridView1"));
+                if (directors.Count > 0)
                 {
-                    if (firstRow)
+                    TableTrs = directors[0].FindElements(By.XPath(".//tr"));
+                    bool firstRow = true;
+                    foreach (IWebElement row in TableTrs)
                     {
-                        firstRow = false;
-                        continue;
+                        if (firstRow)
+                        {
+                            firstRow = false;
+                            continue;
+                        }
+                        System.Collections.ObjectModel.ReadOnlyCollection<IWebElement> RowTds = row.FindElements(By.XPath(".//td"));
+                        string Name = RowTds[1].Text;
+                        string JobTitle = RowTds[2].Text;
+                        System.Collections.ObjectModel.ReadOnlyCollection<IWebElement> Link = row.FindElements(By.XPath(".//a"));
+                        string DetailsUrl = Link[0].GetAttribute("href");
+                        PageTable.Rows.Add(Name, DetailsUrl, JobTitle, "Waiting");
                     }
-                    System.Collections.ObjectModel.ReadOnlyCollection<IWebElement> RowTds = row.FindElements(By.XPath(".//td"));
-                    string Name = RowTds[1].Text;
-                    string JobTitle = RowTds[2].Text;
-                    System.Collections.ObjectModel.ReadOnlyCollection<IWebElement> Link = row.FindElements(By.XPath(".//a"));
-                    string DetailsUrl = Link[0].GetAttribute("href");
-                    PageTable.Rows.Add(Name, DetailsUrl, JobTitle, "Waiting");
                 }
                 pageTableRow["ds_downloadStatus"] = "Success";
 
